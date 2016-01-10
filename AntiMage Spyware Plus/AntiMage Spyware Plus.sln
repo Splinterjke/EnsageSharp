@@ -1,9 +1,8 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiMage Spyware", "AntiMage Spyware\AntiMage Spyware.csproj", "{83223C6C-FF73-4A6D-B70A-7CFB6CEB360D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiMage Spyware Plus", "AntiMage Spyware\AntiMage Spyware Plus.csproj", "{83223C6C-FF73-4A6D-B70A-7CFB6CEB360D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

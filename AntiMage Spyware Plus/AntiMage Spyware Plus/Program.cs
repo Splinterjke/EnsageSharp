@@ -6,7 +6,7 @@ using Ensage.Common;
 using Ensage.Common.Menu;
 using SharpDX;
 
-namespace AntiMage_Spyware
+namespace AntiMage_Spyware_Plus
 {
     internal class Program
     {
@@ -190,4 +190,3 @@ namespace AntiMage_Spyware
 
     }
 }
-//commit
