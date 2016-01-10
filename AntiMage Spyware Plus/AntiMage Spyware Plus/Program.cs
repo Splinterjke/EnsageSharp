@@ -24,6 +24,7 @@ namespace AntiMage_Spyware_Plus
             menu_utama.AddItem(new MenuItem("Killsteal", "Killsteal").SetValue(true));
             menu_utama.AddItem(new MenuItem("Illusion", "Illusion Auto").SetValue(true));
             menu_utama.AddItem(new MenuItem("Manta", "Auto Manta").SetValue(true));
+            //menu_utama.additem();
             Menu.AddSubMenu(menu_utama);
             Menu.AddToMainMenu();
         }
