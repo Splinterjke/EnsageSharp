@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{83223C6C-FF73-4A6D-B70A-7CFB6CEB360D}</ProjectGuid>
+    <ProjectGuid>{B24F0DB1-EFBC-4F07-8D9C-F4EDC58BBAAF}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AntiMage_Spyware</RootNamespace>
-    <AssemblyName>AntiMage Spyware</AssemblyName>
+    <RootNamespace>SkyWrathRage</RootNamespace>
+    <AssemblyName>SkyWrathRage</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -36,34 +36,34 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Frango.cs" />
+    <Compile Include="properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="clipper_library">
+      <HintPath>D:\PlaySharp\System\clipper_library.dll</HintPath>
+    </Reference>
     <Reference Include="Ensage">
-      <HintPath>D:\Doto Chet\LeagueSharp\System\Ensage.dll</HintPath>
+      <HintPath>D:\PlaySharp\System\Ensage.dll</HintPath>
     </Reference>
     <Reference Include="Ensage.Common">
-      <HintPath>D:\Doto Chet\LeagueSharp\System\Ensage.Common.dll</HintPath>
+      <HintPath>D:\PlaySharp\System\Ensage.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Ensage.Menu">
+      <HintPath>D:\PlaySharp\System\Ensage.Menu.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>D:\Doto Chet\LeagueSharp\System\SharpDX.dll</HintPath>
+      <HintPath>D:\PlaySharp\System\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D9">
-      <HintPath>D:\Doto Chet\LeagueSharp\System\SharpDX.Direct3D9.dll</HintPath>
+      <HintPath>D:\PlaySharp\System\SharpDX.Direct3D9.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Drawing" />
     <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

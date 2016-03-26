@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyWrathRage", "SkyWrathRage\SkyWrathRage.csproj", "{B24F0DB1-EFBC-4F07-8D9C-F4EDC58BBAAF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B24F0DB1-EFBC-4F07-8D9C-F4EDC58BBAAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B24F0DB1-EFBC-4F07-8D9C-F4EDC58BBAAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B24F0DB1-EFBC-4F07-8D9C-F4EDC58BBAAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B24F0DB1-EFBC-4F07-8D9C-F4EDC58BBAAF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
