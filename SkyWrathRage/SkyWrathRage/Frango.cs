@@ -83,7 +83,7 @@ namespace SkyWrathRage
             Menu.AddToMainMenu();
                        
             // start
-            PrintSuccess("> SkyWrath rage Script Injected!");
+            Game.PrintMessage("SkyWrath rage Script Injected!", MessageType.LogMessage);
             Game.OnUpdate += Raging;
             Drawing.OnDraw += Information;
             Game.OnWndProc += Activation;
@@ -346,21 +346,6 @@ namespace SkyWrathRage
             Drawing.WorldToScreen(x.Position, out PicPosition);
             PicPosition = new Vector2((float)(PicPosition.X + (scaleX * -0.035)), (float)((PicPosition.Y) + (scaleY * -0.10)));
             return PicPosition;
-        }
-
-        
-
-        private static void PrintSuccess(string text, params object[] arguments)
-        {
-            PrintEncolored(text, ConsoleColor.Green, arguments);
-        }
-
-        private static void PrintEncolored(string text, ConsoleColor color, params object[] arguments)
-        {
-            var clr = Console.ForegroundColor;
-            Console.ForegroundColor = color;
-            Console.WriteLine(text, arguments);
-            Console.ForegroundColor = clr;
         }
     }
 }
