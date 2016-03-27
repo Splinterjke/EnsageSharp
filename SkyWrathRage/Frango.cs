@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Ensage;
 using Ensage.Common.Extensions;
 using Ensage.Common;
-using SharpDX.Direct3D9;
 using SharpDX;
 using Ensage.Common.Menu;
 
@@ -24,6 +20,10 @@ namespace SkyWrathRage
         private static Ability bolt, slow, silence, mysticflare;
         private static Item dust, sentry, soulring, force, cyclone, orchid, sheep, veil, shivas, dagon, atos, ethereal;
         private static Hero me, target;
+        private static Vector2 iconSize, screenPosition;
+        private static DotaTexture heroIcon;
+        private static Hero pTarget = null;
+        private static ParticleEffect circle { get; set; }
         private static readonly Dictionary<string, bool> magic_damage = new Dictionary<string, bool>
             {
                 {"item_shivas_guard",true},
@@ -81,7 +81,7 @@ namespace SkyWrathRage
             _remove_linkens_items.AddItem(new MenuItem("Pop Linkens Items", "Pop Linkens Items").SetValue(new AbilityToggler(remove_linkens)));
             _skills.AddItem(new MenuItem("Skills", "Skills").SetValue(new AbilityToggler(skills_menu)));
             Menu.AddToMainMenu();
-                       
+
             // start
             Game.PrintMessage("SkyWrath rage Script Injected!", MessageType.LogMessage);
             Game.OnUpdate += Raging;
@@ -96,13 +96,13 @@ namespace SkyWrathRage
             me = ObjectMgr.LocalHero;
             if (me == null || me.ClassID != ClassID.CDOTA_Unit_Hero_Skywrath_Mage)
                 return;
+            target = me.ClosestToMouseTarget(600);
             if (Game.IsKeyDown(Menu.Item("Chase Key").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
             {
-                FindItems();
-                target = me.ClosestToMouseTarget();
+                FindItems();                
                 if (target != null && target.IsValid && target.IsVisible && !target.IsIllusion && target.IsAlive && !me.IsChanneling() && !target.IsInvul())
                 {
-                    
+
                     if (Utils.SleepCheck("FASTCOMBO"))
                     {
                         if (bolt.Level > 0 && bolt.CanBeCasted() && !target.IsMagicImmune() && Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(bolt.Name))
@@ -120,14 +120,13 @@ namespace SkyWrathRage
                         me.Move(Game.MousePosition, false);
                 }
             }
-            
+
             if (Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
             {
-                FindItems();
-                target = me.ClosestToMouseTarget(1200);
+                FindItems();               
                 if (target != null && target.IsValid && target.IsVisible && !target.IsIllusion && target.IsAlive && !me.IsChanneling() && !target.IsInvul())
                 {
-                    
+                    //circle.SetControlPoint(1, new Vector3(178, 34, 34));
                     if (target.IsLinkensProtected())
                     {
                         if (Utils.SleepCheck("DistanceDelay"))
@@ -242,11 +241,12 @@ namespace SkyWrathRage
                 }
                 else
                 {
+                    //circle.Dispose();
                     if (!me.IsChanneling())
                         me.Move(Game.MousePosition, false);
                 }
             }
-            
+
         }
 
         static bool IsLinkensProtected(Hero x)
@@ -328,24 +328,54 @@ namespace SkyWrathRage
                 return;
             if (me.ClassID != ClassID.CDOTA_Unit_Hero_Skywrath_Mage)
                 return;
-            target = me.ClosestToMouseTarget(2000);
+                        
             if (target != null && target.IsValid && !target.IsIllusion && target.IsAlive && target.IsVisible)
-            {
-                FindItems();
-                Drawing.DrawText(EZkill() ? "EZKILL" : "Simple Target", HeroPositionOnScreen(target), new Vector2(18, 200), EZkill() ? Color.ForestGreen : Color.MintCream, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+            {                
+                DrawTarget();
+                pTarget = target;
             }
+            else
+            {
+                circle.Dispose();
+                circle = null;
+            }
+
             if (!Utils.SleepCheck("Ultimate Key"))
                 Drawing.DrawText(Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare") == true ? "ON" : "OFF", new Vector2(HUDInfo.ScreenSizeX() / 2, HUDInfo.ScreenSizeY() / 2), new Vector2(30, 200), Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare") == true ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
         }
 
-        static Vector2 HeroPositionOnScreen(Hero x)
+        private static void DrawTarget()
         {
-            float scaleX = HUDInfo.ScreenSizeX();
-            float scaleY = HUDInfo.ScreenSizeY();
-            Vector2 PicPosition;
-            Drawing.WorldToScreen(x.Position, out PicPosition);
-            PicPosition = new Vector2((float)(PicPosition.X + (scaleX * -0.035)), (float)((PicPosition.Y) + (scaleY * -0.10)));
-            return PicPosition;
+            heroIcon = Drawing.GetTexture("materials/ensage_ui/miniheroes/skywrath_mage");
+            iconSize = new Vector2(HUDInfo.GetHpBarSizeY() * 2);
+
+            Vector2 screenPosition;
+            if (
+                !Drawing.WorldToScreen(
+                    target.Position + new Vector3(0, 0, target.HealthBarOffset / 3),
+                    out screenPosition))
+            {
+                return;
+            }
+
+            screenPosition += new Vector2(-iconSize.X, 0);
+            Drawing.DrawRect(screenPosition, iconSize, heroIcon);
+
+            if (circle == null)
+            {
+                circle = new ParticleEffect(@"particles\ui_mouseactions\drag_selected_ring.vpcf", target);
+                circle.SetControlPoint(1, new Vector3(255, 0, 0));
+                circle.SetControlPoint(2, new Vector3(85, 255, 0));
+            }
+            else if (circle != null && target != pTarget)
+            {
+                circle.Dispose();
+                circle = null;
+                circle = new ParticleEffect(@"particles\ui_mouseactions\drag_selected_ring.vpcf", target);
+                circle.SetControlPoint(1, new Vector3(255, 0, 0));
+                circle.SetControlPoint(2, new Vector3(85, 255, 0));
+            }
         }
     }
 }
+
