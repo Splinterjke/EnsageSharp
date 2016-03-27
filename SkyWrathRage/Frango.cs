@@ -310,7 +310,7 @@ namespace SkyWrathRage
 
         }
 
-        static void Activation(EventArgs args)
+        private static void Activation(EventArgs args)
         {
             if (Game.IsKeyDown(Menu.Item("Ultimate Key").GetValue<KeyBind>().Key) && !Game.IsChatOpen && Utils.SleepCheck("Ultimate Key"))
             {
@@ -319,16 +319,9 @@ namespace SkyWrathRage
             }
         }
 
-        static void Information(EventArgs args)
+        private static void Information(EventArgs args)
         {
-            if (!Game.IsInGame || Game.IsWatchingGame)
-                return;
-            me = ObjectMgr.LocalHero;
-            if (me == null)
-                return;
-            if (me.ClassID != ClassID.CDOTA_Unit_Hero_Skywrath_Mage)
-                return;
-                        
+                                    
             if (target != null && target.IsValid && !target.IsIllusion && target.IsAlive && target.IsVisible)
             {                
                 DrawTarget();
@@ -336,8 +329,11 @@ namespace SkyWrathRage
             }
             else
             {
-                circle.Dispose();
-                circle = null;
+                if (circle != null)
+                {
+                    circle.Dispose();
+                    circle = null;
+                }
             }
 
             if (!Utils.SleepCheck("Ultimate Key"))
