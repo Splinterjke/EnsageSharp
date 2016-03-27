@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoShackle", "AutoShackle\AutoShackle.csproj", "{156D7776-B8D5-4E16-B1AA-BE62A6777D3D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoShackle", "AutoShackle.csproj", "{156D7776-B8D5-4E16-B1AA-BE62A6777D3D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
