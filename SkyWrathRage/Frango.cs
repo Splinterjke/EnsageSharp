@@ -22,7 +22,6 @@ namespace SkyWrathRage
         private static Hero _me, _target;
         private static Vector2 _iconSize, _screenPosition;
         private static DotaTexture _heroIcon;
-        private static Hero _pTarget;
 
         private static readonly Dictionary<string, bool> MagicDamage = new Dictionary<string, bool>
         {
@@ -186,20 +185,20 @@ namespace SkyWrathRage
                     bool ezkillCheck = EZkill(), magicImune = _target.IsMagicImmune();
                     if (_soulring != null && _soulring.CanBeCasted() && Menu.Item("Soulring").GetValue<bool>())
                         _soulring.UseAbility();
-                    
+
                     if (_sheep != null && _sheep.CanBeCasted() && !_target.UnitState.HasFlag(UnitState.Hexed) &&
                         !_target.UnitState.HasFlag(UnitState.Stunned) && !magicImune &&
                         Menu.Item("Disable/slow Items").GetValue<AbilityToggler>().IsEnabled(_sheep.Name))
                         _sheep.UseAbility(_target);
-                    
+
                     if (_silence.Level > 0 && _silence.CanBeCasted() && !magicImune &&
                         Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(_silence.Name))
                         _silence.UseAbility(_target);
-                    
+
                     if (_atos != null && _atos.CanBeCasted() && !magicImune && _target.MovementSpeed >= 200 &&
                         Menu.Item("Disable/slow Items").GetValue<AbilityToggler>().IsEnabled(_atos.Name))
                         _atos.UseAbility(_target);
-                   
+
                     if (_slow.Level > 0 && _slow.CanBeCasted() && _target.NetworkPosition.Distance2D(_me) <= 1600 &&
                         !magicImune && Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(_slow.Name))
                     {
@@ -208,19 +207,19 @@ namespace SkyWrathRage
                             Utils.Sleep(_me.NetworkPosition.Distance2D(_target.NetworkPosition)/500*1000,
                                 "SlowDelay");
                     }
-                    
+
                     if (_orchid != null && _orchid.CanBeCasted() && !magicImune &&
                         Menu.Item("Magic Amplify Items").GetValue<AbilityToggler>().IsEnabled(_orchid.Name))
                         _orchid.UseAbility(_target);
-                    
+
                     if (_veil != null && _veil.CanBeCasted() && !magicImune &&
                         Menu.Item("Magic Amplify Items").GetValue<AbilityToggler>().IsEnabled(_veil.Name))
                         _veil.UseAbility(_target.NetworkPosition);
-                    
+
                     if (_shivas != null && _shivas.CanBeCasted() && !ezkillCheck && !magicImune &&
                         Menu.Item("Magic Damage Items").GetValue<AbilityToggler>().IsEnabled(_shivas.Name))
                         _shivas.UseAbility();
-                    
+
                     if (_ethereal != null && _ethereal.CanBeCasted() &&
                         (!_veil.CanBeCasted() ||
                          _veil == null |
@@ -233,7 +232,7 @@ namespace SkyWrathRage
                             Utils.Sleep(_me.NetworkPosition.Distance2D(_target.NetworkPosition)/1200*1000,
                                 "EtherealDelay");
                     }
-                    
+
                     if (_dagon != null && _dagon.CanBeCasted() &&
                         (!_veil.CanBeCasted() ||
                          _veil == null |
@@ -242,11 +241,11 @@ namespace SkyWrathRage
                         !magicImune &&
                         Menu.Item("Magic Damage Items").GetValue<AbilityToggler>().IsEnabled("item_dagon"))
                         _dagon.UseAbility(_target);
-                    
+
                     if (_bolt.Level > 0 && _bolt.CanBeCasted() && !ezkillCheck && !magicImune &&
                         Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(_bolt.Name))
                         _bolt.UseAbility(_target);
-                    
+
                     if (_mysticflare.Level > 0 && _mysticflare.CanBeCasted() && (Utils.SleepCheck("EtherealDelay")
                                                                                  && Utils.SleepCheck("SlowDelay") ||
                                                                                  _target.UnitState.HasFlag(
@@ -355,7 +354,6 @@ namespace SkyWrathRage
             if (_target != null && _target.IsValid && !_target.IsIllusion && _target.IsAlive && _target.IsVisible)
             {
                 DrawTarget();
-                _pTarget = _target;
             }
             else
             {
@@ -394,18 +392,16 @@ namespace SkyWrathRage
 
             if (Circle == null)
             {
-                Circle = new ParticleEffect(@"particles\ui\ui_sweeping_ring.vpcf", _target);
-                Circle.SetControlPoint(1, new Vector3(255, 255, 0));
-                Circle.SetControlPoint(2, new Vector3(85, 255, 0));
+                Circle = new ParticleEffect(@"particles\ui_mouseactions\range_finder_tower_aoe.vpcf", _target);
+                Circle.SetControlPoint(2, new Vector3(_me.Position.X, _me.Position.Y, _me.Position.Z));
+                Circle.SetControlPoint(6, new Vector3(1, 0, 0));
+                Circle.SetControlPoint(7, new Vector3(_target.Position.X, _target.Position.Y, _target.Position.Z));
             }
-            else if (Circle != null && !_target.Equals(_pTarget))
+            else
             {
-                Circle.Dispose();
-                Circle = null;
-                //Circle = new ParticleEffect(@"particles\ui_mouseactions\drag_selected_ring.vpcf", _target);
-                Circle = new ParticleEffect(@"particles\ui\ui_sweeping_ring.vpcf", _target);
-                Circle.SetControlPoint(1, new Vector3(255, 0, 0));
-                Circle.SetControlPoint(2, new Vector3(85, 255, 0));
+                Circle.SetControlPoint(2, new Vector3(_me.Position.X, _me.Position.Y, _me.Position.Z));
+                Circle.SetControlPoint(6, new Vector3(1, 0, 0));
+                Circle.SetControlPoint(7, new Vector3(_target.Position.X, _target.Position.Y, _target.Position.Z));
             }
         }
     }
