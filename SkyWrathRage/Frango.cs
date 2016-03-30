@@ -93,7 +93,7 @@ namespace SkyWrathRage
             Menu.AddToMainMenu();
 
             // start
-            Game.PrintMessage("SkyWrath rage Script Injected!", MessageType.LogMessage);
+            Game.PrintMessage("SkyWrathRage is Injected! (Credits to Bruninjaman)", MessageType.LogMessage);
             Game.OnUpdate += Raging;
             Drawing.OnDraw += Information;
         }
