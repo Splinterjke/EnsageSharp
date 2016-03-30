@@ -70,7 +70,6 @@ namespace SkyWrathRage
 
         private static void Main()
         {
-            Menu.AddItem(new MenuItem("Ultimate Key", "Ultimate Key").SetValue(new KeyBind('F', KeyBindType.Press)));
             Menu.AddItem(new MenuItem("Combo Key", "Combo Key").SetValue(new KeyBind('D', KeyBindType.Press)));
             Menu.AddItem(new MenuItem("Chase Key", "Chase Key").SetValue(new KeyBind('T', KeyBindType.Press)));
             Menu.AddItem(
@@ -97,7 +96,6 @@ namespace SkyWrathRage
             Game.PrintMessage("SkyWrath rage Script Injected!", MessageType.LogMessage);
             Game.OnUpdate += Raging;
             Drawing.OnDraw += Information;
-            Game.OnWndProc += Activation;
         }
 
         public static void Raging(EventArgs args)
@@ -340,38 +338,15 @@ namespace SkyWrathRage
             return _target.Health < alldamage;
         }
 
-        private static void Activation(EventArgs args)
-        {
-            if (!Game.IsKeyDown(Menu.Item("Ultimate Key").GetValue<KeyBind>().Key) || Game.IsChatOpen ||
-                !Utils.SleepCheck("Ultimate Key")) return;
-            SkillsMenu["skywrath_mage_mystic_flare"] =
-                !Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare");
-            Utils.Sleep(400, "Ultimate Key");
-        }
-
         private static void Information(EventArgs args)
         {
             if (_target != null && _target.IsValid && !_target.IsIllusion && _target.IsAlive && _target.IsVisible)
-            {
                 DrawTarget();
-            }
-            else
-            {
-                if (Circle != null)
+            else if (Circle != null)
                 {
                     Circle.Dispose();
                     Circle = null;
                 }
-            }
-
-            if (!Utils.SleepCheck("Ultimate Key"))
-                Drawing.DrawText(
-                    Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare")
-                        ? "ON"
-                        : "OFF", new Vector2(HUDInfo.ScreenSizeX()/2, HUDInfo.ScreenSizeY()/2), new Vector2(30, 200),
-                    Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare")
-                        ? Color.LimeGreen
-                        : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
         }
 
         private static void DrawTarget()
