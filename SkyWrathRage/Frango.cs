@@ -93,7 +93,7 @@ namespace SkyWrathRage
             Menu.AddToMainMenu();
 
             // start
-            Game.PrintMessage("SkyWrathRage is Injected! (Credits to Bruninjaman)", MessageType.LogMessage);
+            
             Game.OnUpdate += Raging;
             Drawing.OnDraw += Information;
         }
@@ -105,6 +105,7 @@ namespace SkyWrathRage
             _me = ObjectManager.LocalHero;
             if (_me == null || _me.ClassID != ClassID.CDOTA_Unit_Hero_Skywrath_Mage)
                 return;
+            Game.PrintMessage("SkyWrathRage is Injected! (Credits to Bruninjaman)", MessageType.LogMessage);
             _target = _me.ClosestToMouseTarget(600);
             if (Game.IsKeyDown(Menu.Item("Chase Key").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
             {
