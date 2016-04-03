@@ -17,6 +17,7 @@ namespace SkyWrathRage
         private static readonly Menu DisableItems = new Menu("Disable/slow Items", "Disable/slow Items");
         private static readonly Menu RemoveLinkensItems = new Menu("Pop Linkens Items", "Pop Linkens Items");
         private static readonly Menu Skills = new Menu("Skills", "Skills");
+        private static bool _loaded;
         private static Ability _bolt, _slow, _silence, _mysticflare;
         private static Item _soulring, _force, _cyclone, _orchid, _sheep, _veil, _shivas, _dagon, _atos, _ethereal;
         private static Hero _me, _target;
@@ -65,7 +66,7 @@ namespace SkyWrathRage
             {"skywrath_mage_mystic_flare", true}
         };
 
-        private static readonly int[] BoltDamage = {60, 80, 100, 120};
+        private static readonly int[] BoltDamage = { 60, 80, 100, 120 };
         private static ParticleEffect Circle { get; set; }
 
         private static void Main()
@@ -91,9 +92,7 @@ namespace SkyWrathRage
                 new MenuItem("Pop Linkens Items", "Pop Linkens Items").SetValue(new AbilityToggler(RemoveLinkens)));
             Skills.AddItem(new MenuItem("Skills", "Skills").SetValue(new AbilityToggler(SkillsMenu)));
             Menu.AddToMainMenu();
-
-            // start
-            
+          
             Game.OnUpdate += Raging;
             Drawing.OnDraw += Information;
         }
@@ -102,10 +101,27 @@ namespace SkyWrathRage
         {
             if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame)
                 return;
-            _me = ObjectManager.LocalHero;
-            if (_me == null || _me.ClassID != ClassID.CDOTA_Unit_Hero_Skywrath_Mage)
+            if (!_loaded)
+            {
+                _me = ObjectManager.LocalHero;
+                if (!Game.IsInGame || _me == null || _me.ClassID != ClassID.CDOTA_Unit_Hero_Skywrath_Mage)
+                {
+                    return;
+                }
+
+                _loaded = true;
+                Game.PrintMessage(
+                    "<font face='Calibri Bold'><font color='#fff511'>SkyWrathRage is Injected</font> (credits to <font color='#999999'>bruninjaman)</font>",
+                    MessageType.LogMessage);
+            }
+            
+            if (_me == null || !_me.IsValid)
+            {
+                _loaded = false;
+                _me = ObjectManager.LocalHero;
                 return;
-            Game.PrintMessage("SkyWrathRage is Injected! (Credits to Bruninjaman)", MessageType.LogMessage);
+            }
+
             _target = _me.ClosestToMouseTarget(600);
             if (Game.IsKeyDown(Menu.Item("Chase Key").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
             {
@@ -160,7 +176,7 @@ namespace SkyWrathRage
                     {
                         _bolt.UseAbility(_target);
                         Utils.Sleep(
-                            _me.NetworkPosition.Distance2D(_target.NetworkPosition)/500*1000,
+                            _me.NetworkPosition.Distance2D(_target.NetworkPosition) / 500 * 1000,
                             "DistanceDelay");
                     }
                     else if (_dagon != null && _dagon.CanBeCasted() &&
@@ -171,8 +187,8 @@ namespace SkyWrathRage
                     {
                         _ethereal.UseAbility(_target);
                         Utils.Sleep(
-                            _me.NetworkPosition.Distance2D(_target.NetworkPosition)/
-                            1200*1000, "DistanceDelay");
+                            _me.NetworkPosition.Distance2D(_target.NetworkPosition) /
+                            1200 * 1000, "DistanceDelay");
                     }
                     else if (_sheep != null && _sheep.CanBeCasted() &&
                              Menu.Item("Pop Linkens Items").GetValue<AbilityToggler>().IsEnabled(_sheep.Name))
@@ -203,7 +219,7 @@ namespace SkyWrathRage
                     {
                         _slow.UseAbility();
                         if (Utils.SleepCheck("SlowDelay") && _me.Distance2D(_target) <= _slow.CastRange)
-                            Utils.Sleep(_me.NetworkPosition.Distance2D(_target.NetworkPosition)/500*1000,
+                            Utils.Sleep(_me.NetworkPosition.Distance2D(_target.NetworkPosition) / 500 * 1000,
                                 "SlowDelay");
                     }
 
@@ -228,7 +244,7 @@ namespace SkyWrathRage
                     {
                         _ethereal.UseAbility(_target);
                         if (Utils.SleepCheck("EtherealDelay") && _me.Distance2D(_target) <= _ethereal.CastRange)
-                            Utils.Sleep(_me.NetworkPosition.Distance2D(_target.NetworkPosition)/1200*1000,
+                            Utils.Sleep(_me.NetworkPosition.Distance2D(_target.NetworkPosition) / 1200 * 1000,
                                 "EtherealDelay");
                     }
 
@@ -254,9 +270,9 @@ namespace SkyWrathRage
                                                                                  _target.MovementSpeed <= 280)
                         && !ezkillCheck && Utils.SleepCheck("MysticDamaging")
                         &&
-                        (_target.DamageTaken((int) (BoltDamage[_bolt.Level - 1] + _me.TotalIntelligence*1.6),
-                            DamageType.Magical, _me)*2 <= _target.Health
-                         || _me.Health <= (int) (_me.MaximumHealth*0.35))
+                        (_target.DamageTaken((int)(BoltDamage[_bolt.Level - 1] + _me.TotalIntelligence * 1.6),
+                            DamageType.Magical, _me) * 2 <= _target.Health
+                         || _me.Health <= (int)(_me.MaximumHealth * 0.35))
                         &&
                         (!_atos.CanBeCasted() ||
                          _atos == null |
@@ -272,8 +288,8 @@ namespace SkyWrathRage
                         if (!_target.CanMove() || _target.NetworkActivity == NetworkActivity.Idle)
                             _mysticflare.UseAbility(_target.NetworkPosition);
                         else
-                            _mysticflare.UseAbility(Prediction.PredictedXYZ(_target, 220/_target.MovementSpeed*1000));
-                        var mysticflaredamage = new[] {600, 1000, 1400};
+                            _mysticflare.UseAbility(Prediction.PredictedXYZ(_target, 220 / _target.MovementSpeed * 1000));
+                        var mysticflaredamage = new[] { 600, 1000, 1400 };
                         if (_target.Health <=
                             _target.DamageTaken(mysticflaredamage[_mysticflare.Level - 1], DamageType.Magical, _me))
                             Utils.Sleep(2500, "MysticDamaging");
@@ -313,8 +329,8 @@ namespace SkyWrathRage
         {
             if (_target == null || !_target.IsAlive || !_target.IsValid) return false;
             int alldamage = 0, percent = 0;
-            var dagondamage = new[] {400, 500, 600, 700, 800};
-            var etherealdamage = (int) (_me.TotalIntelligence*2) + 75;
+            var dagondamage = new[] { 400, 500, 600, 700, 800 };
+            var etherealdamage = (int)(_me.TotalIntelligence * 2) + 75;
             if (_orchid != null && _orchid.CanBeCasted() &&
                 Menu.Item("Magic Amplify Items").GetValue<AbilityToggler>().IsEnabled(_orchid.Name))
                 alldamage += 30;
@@ -326,7 +342,7 @@ namespace SkyWrathRage
                 percent += 25;
             if (_silence.Level > 0 && _silence.CanBeCasted() &&
                 Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(_silence.Name))
-                percent += (int) ((_silence.Level - 1)*5) + 30;
+                percent += (int)((_silence.Level - 1) * 5) + 30;
             if (_dagon != null && _dagon.CanBeCasted() &&
                 Menu.Item("Magic Damage Items").GetValue<AbilityToggler>().IsEnabled("item_dagon"))
                 alldamage +=
@@ -335,7 +351,7 @@ namespace SkyWrathRage
                             percent);
             if (_ethereal != null && _ethereal.CanBeCasted() &&
                 Menu.Item("Magic Amplify Items").GetValue<AbilityToggler>().IsEnabled(_ethereal.Name))
-                alldamage += (int) _target.DamageTaken(etherealdamage, DamageType.Magical, _me, false, 0, 0, 25);
+                alldamage += (int)_target.DamageTaken(etherealdamage, DamageType.Magical, _me, false, 0, 0, 25);
             return _target.Health < alldamage;
         }
 
@@ -344,20 +360,20 @@ namespace SkyWrathRage
             if (_target != null && _target.IsValid && !_target.IsIllusion && _target.IsAlive && _target.IsVisible)
                 DrawTarget();
             else if (Circle != null)
-                {
-                    Circle.Dispose();
-                    Circle = null;
-                }
+            {
+                Circle.Dispose();
+                Circle = null;
+            }
         }
 
         private static void DrawTarget()
         {
             _heroIcon = Drawing.GetTexture("materials/ensage_ui/miniheroes/skywrath_mage");
-            _iconSize = new Vector2(HUDInfo.GetHpBarSizeY()*2);
+            _iconSize = new Vector2(HUDInfo.GetHpBarSizeY() * 2);
 
             if (
                 !Drawing.WorldToScreen(
-                    _target.Position + new Vector3(0, 0, _target.HealthBarOffset/3),
+                    _target.Position + new Vector3(0, 0, _target.HealthBarOffset / 3),
                     out _screenPosition))
             {
                 return;
