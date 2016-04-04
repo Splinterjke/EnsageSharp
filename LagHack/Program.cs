@@ -27,10 +27,7 @@ namespace LagHack
                 return;
             if (_loaded) return;
             _me = ObjectManager.LocalHero;
-            if (!Game.IsInGame || _me == null)
-            {
-                return;
-            }
+            if (_me == null) return;
             Game.PrintMessage(
                 "<font face='Calibri Bold'><font color='#fff511'>LagHack is Injected</font> (credits to <font color='#999999'>Splinter)</font>",
                 MessageType.LogMessage);
@@ -41,8 +38,8 @@ namespace LagHack
         private static void Laghack(EventArgs args)
         {
             if (!Game.IsKeyDown(Menu.Item("keybind").GetValue<KeyBind>().Key) || Game.IsChatOpen ||
-                !Utils.SleepCheck("rate")) return;
-            for (var i=0; i<999; i++)
+                !Utils.SleepCheck("rate") || !_loaded) return;
+            for (var i=0; i<499; i++)
             Game.ExecuteCommand("kill");
             Utils.Sleep(Menu.Item("rate").GetValue<Slider>().Value, "update");
         }
