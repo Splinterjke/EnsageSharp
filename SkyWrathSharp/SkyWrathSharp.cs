@@ -86,7 +86,7 @@ namespace SkyWrathSharp
                 UseItem(shivas, shivas.GetCastRange());
                 
                 Moving();
-                Utils.Sleep(200, "combosleep");
+                Utils.Sleep(150, "combosleep");
 
             }
         }
