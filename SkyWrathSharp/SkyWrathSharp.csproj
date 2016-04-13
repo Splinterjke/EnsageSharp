@@ -7,8 +7,8 @@
     <ProjectGuid>{B24F0DB1-EFBC-4F07-8D9C-F4EDC58BBAAF}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SkyWrathRage</RootNamespace>
-    <AssemblyName>SkyWrathRage</AssemblyName>
+    <RootNamespace>SkyWrathSharp</RootNamespace>
+    <AssemblyName>SkyWrathSharp</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -39,8 +39,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Frango.cs" />
+    <Compile Include="Init.cs" />
+    <Compile Include="Options.cs" />
+    <Compile Include="SkyWrathSharp.cs" />
     <Compile Include="properties\AssemblyInfo.cs" />
+    <Compile Include="Variables.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="clipper_library">
@@ -52,14 +55,8 @@
     <Reference Include="Ensage.Common">
       <HintPath>D:\PlaySharp\System\Ensage.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Ensage.Menu">
-      <HintPath>D:\PlaySharp\System\Ensage.Menu.dll</HintPath>
-    </Reference>
     <Reference Include="SharpDX">
       <HintPath>D:\PlaySharp\System\SharpDX.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Direct3D9">
-      <HintPath>D:\PlaySharp\System\SharpDX.Direct3D9.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />

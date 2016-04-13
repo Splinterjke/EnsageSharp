@@ -1,0 +1,260 @@
+﻿using System;
+using System.Linq;
+using Ensage;
+using Ensage.Common;
+using Ensage.Common.Menu;
+using Ensage.Common.Extensions;
+using SharpDX;
+
+namespace SkyWrathSharp
+{
+    internal class SkyWrathSharp : Variables
+    {
+        public static void Init()
+        {
+            Options.MenuInit();
+            Game.OnUpdate += ComboUsage;
+            Drawing.OnDraw += TargetIndicator;
+        }
+
+        private static void ComboUsage(EventArgs args)
+        {
+            if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame)
+                return;
+            if (!loaded)
+            {
+                me = ObjectManager.LocalHero;
+                if (!Game.IsInGame || me == null || me.ClassID != ClassID.CDOTA_Unit_Hero_Skywrath_Mage)
+                {
+                    return;
+                }
+
+                loaded = true;
+                Game.PrintMessage(
+                    "<font face='Calibri Bold'><font color='#fff511'>SkyWrathRage is Injected</font> (credits to <font color='#999999'>Splinter)</font>",
+                    MessageType.LogMessage);
+            }
+
+            if (me == null || !me.IsValid)
+            {
+                loaded = false;
+                me = ObjectManager.LocalHero;
+                return;
+            }
+
+            target = me.ClosestToMouseTarget(600);
+
+            if (!Game.IsKeyDown(Menu.Item("comboKey").GetValue<KeyBind>().Key) || Game.IsChatOpen) return;
+
+            GetAbilities();
+
+            if (target == null || !target.IsValid || !target.IsVisible || target.IsIllusion || !target.IsAlive ||
+                me.IsChanneling() || target.IsInvul() || HasModifiers()) return;
+
+            if (target.IsLinkensProtected())
+            {
+                PopLinkens(cyclone);
+                PopLinkens(force_staff);
+                PopLinkens(atos);
+                PopLinkens(sheep);
+                PopLinkens(orchid);
+                PopLinkens(dagon);
+                PopLinkens(silence);
+            }
+            else
+            {
+                if (!Utils.SleepCheck("combosleep")) return;
+                if (soulring != null && soulring.CanBeCasted() && Menu.Item("soulRing").GetValue<bool>())
+                    soulring.UseAbility();
+
+                if (!target.UnitState.HasFlag(UnitState.Hexed) && !target.UnitState.HasFlag(UnitState.Stunned))
+                    UseItem(sheep, sheep.GetCastRange());
+
+                CastAbility(silence, silence.GetCastRange());
+                CastAbility(slow, 1600);
+                CastAbility(bolt, bolt.GetCastRange());
+                CastUltimate(mysticflare);
+
+                UseItem(atos, atos.GetCastRange(), 200);
+                UseItem(orchid, orchid.GetCastRange());
+                UseItem(veil, veil.GetCastRange());
+                if (!target.HasModifier("modifier_skywrath_mage_ancient_seal") && silence.CanBeCasted() && Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(silence.Name))
+                    UseItem(ethereal, silence.GetCastRange());
+                else
+                    UseItem(ethereal, ethereal.GetCastRange());
+                UseItem(dagon, dagon.GetCastRange());
+                UseItem(shivas, shivas.GetCastRange());
+                
+                Moving();
+                Utils.Sleep(200, "combosleep");
+
+            }
+        }
+
+        private static void GetAbilities()
+        {
+            if (!Utils.SleepCheck("GetAbilities")) return;
+            soulring = me.FindItem("item_soul_ring");
+            force_staff = me.FindItem("item_force_staff");
+            cyclone = me.FindItem("item_cyclone");
+            orchid = me.FindItem("item_orchid");
+            sheep = me.FindItem("item_sheepstick");
+            veil = me.FindItem("item_veil_of_discord");
+            shivas = me.FindItem("item_shivas_guard");
+            dagon = me.Inventory.Items.FirstOrDefault(item => item.Name.Contains("item_dagon"));
+            atos = me.FindItem("item_rod_of_atos");
+            ethereal = me.FindItem("item_ethereal_blade");
+            bolt = me.FindSpell("skywrath_mage_arcane_bolt");
+            slow = me.FindSpell("skywrath_mage_concussive_shot");
+            silence = me.FindSpell("skywrath_mage_ancient_seal");
+            mysticflare = me.FindSpell("skywrath_mage_mystic_flare");
+            Utils.Sleep(5000, "GetAbilities");
+        }
+
+        private static bool HasModifiers()
+        {
+            if (target.HasModifiers(modifiersNames, false) ||
+                (Menu.Item("bladeMail").GetValue<bool>() && target.HasModifier("modifier_item_blade_mail_reflect")) || !Utils.SleepCheck("HasModifiers"))
+                return true;
+            Utils.Sleep(100, "HasModifiers");
+            return false;
+        }
+
+        private static void TargetIndicator(EventArgs args)
+        {
+            if (target != null && target.IsValid && !target.IsIllusion && target.IsAlive && target.IsVisible)
+                DrawTarget();
+            else if (circle != null)
+            {
+                circle.Dispose();
+                circle = null;
+            }
+        }
+
+        private static void DrawTarget()
+        {
+            heroIcon = Drawing.GetTexture("materials/ensage_ui/miniheroes/skywrath_mage");
+            iconSize = new Vector2(HUDInfo.GetHpBarSizeY() * 2);
+
+            if (
+                !Drawing.WorldToScreen(
+                    target.Position + new Vector3(0, 0, target.HealthBarOffset / 3),
+                    out screenPosition))
+            {
+                return;
+            }
+
+            screenPosition += new Vector2(-iconSize.X, 0);
+            Drawing.DrawRect(screenPosition, iconSize, heroIcon);
+
+            if (circle == null)
+            {
+                circle = new ParticleEffect(@"particles\ui_mouseactions\range_finder_tower_aoe.vpcf", target);
+                circle.SetControlPoint(2, new Vector3(me.Position.X, me.Position.Y, me.Position.Z));
+                circle.SetControlPoint(6, new Vector3(1, 0, 0));
+                circle.SetControlPoint(7, new Vector3(target.Position.X, target.Position.Y, target.Position.Z));
+            }
+            else
+            {
+                circle.SetControlPoint(2, new Vector3(me.Position.X, me.Position.Y, me.Position.Z));
+                circle.SetControlPoint(6, new Vector3(1, 0, 0));
+                circle.SetControlPoint(7, new Vector3(target.Position.X, target.Position.Y, target.Position.Z));
+            }
+        }
+
+        private static void CastAbility(Ability ability, float range)
+        {
+            if (ability == null || !ability.CanBeCasted() || target.IsMagicImmune() ||
+                !(target.NetworkPosition.Distance2D(me) - target.RingRadius <= range) ||
+                !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(ability.Name)) return;
+            
+            if (ability.IsAbilityBehavior(AbilityBehavior.UnitTarget))
+            {
+                ability.UseAbility(target);
+            }
+            if (ability.IsAbilityBehavior(AbilityBehavior.NoTarget))
+            {
+                ability.UseAbility();
+            }
+        }
+
+        private static void CastUltimate(Ability ulti)
+        {
+            if (!Utils.SleepCheck("ulti") ||
+                ulti == null ||
+               !ulti.CanBeCasted() ||
+                target.MovementSpeed > 280 ||
+                target.HasModifier("modifier_rune_haste") ||
+                target.IsMagicImmune() ||
+               !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare")) return;
+
+            if (!target.CanMove() || target.NetworkActivity == NetworkActivity.Idle ||
+                target.UnitState.HasFlag(UnitState.Frozen) || target.UnitState.HasFlag(UnitState.Stunned))
+                mysticflare.UseAbility(target.NetworkPosition);
+            else
+                mysticflare.UseAbility(Prediction.PredictedXYZ(target, 220 / target.MovementSpeed * 1000));
+            if (target.Health <= target.DamageTaken(mysticflare.GetAbilityData("damage"), DamageType.Magical, me))
+                Utils.Sleep(2500, "ulti");
+        }
+
+        //private static void NonUltiCasting()
+        //{
+
+        //}
+
+        private static void UseItem(Item item, float range, int speed = 0)
+        {
+            if (item == null || !item.CanBeCasted() || target.IsMagicImmune() || target.MovementSpeed < speed ||
+                target.HasModifier(item.Name) || !(target.NetworkPosition.Distance2D(me) - target.RingRadius <= range) ||
+                !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(item.Name))
+                return;
+
+            if (item.IsAbilityBehavior(AbilityBehavior.UnitTarget) && !Equals(item, dagon))
+            {
+                item.UseAbility(target);
+                return;
+            }
+            
+            if (item.IsAbilityBehavior(AbilityBehavior.Point))
+            {
+                item.UseAbility(target.NetworkPosition);
+                return;
+            }
+
+            if (item.IsAbilityBehavior(AbilityBehavior.Immediate))
+            {
+                item.UseAbility();
+                return;
+            }
+
+            if ((!silence.CanBeCasted() | !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(silence.Name)) ||
+                (!veil.CanBeCasted() | !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(veil.Name))
+               /* || ((!ethereal.CanBeCasted() && target.HasModifier("modifier_item_ethereal_blade_slow")) | !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(ethereal.Name))*/)
+                item.UseAbility(target);
+        }
+
+        private static void PopLinkens(Ability item)
+        {
+            if (item == null || !item.CanBeCasted() || !Menu.Item("popLinkensItems").GetValue<AbilityToggler>().IsEnabled(item.Name) || !Utils.SleepCheck("PopLinkens")) return;
+            item.UseAbility(target);
+            Utils.Sleep(100, "PopLinkens");
+        }
+
+        private static void Moving()
+        {
+            switch (moveMode.GetValue<StringList>().SelectedIndex)
+            {
+                case 0:
+                    Orbwalking.Orbwalk(target, bonusRange: -me.AttackRange + Menu.Item("noMoveRange").GetValue<Slider>().Value);
+                    break;
+
+                case 1:
+                    me.Move(Game.MousePosition, false);
+                    break;
+
+                case 2:
+                    return;
+            }
+        }
+    }
+}
