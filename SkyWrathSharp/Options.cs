@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Ensage.Common.Menu;
+﻿using Ensage.Common.Menu;
 
 namespace SkyWrathSharp
 {
@@ -14,7 +13,7 @@ namespace SkyWrathSharp
             bladeMail = new MenuItem("bladeMail", "Check for BladeMail").SetValue(false);
             drawTarget = new MenuItem("drawTarget", "Target indicator").SetValue(true);
             moveMode = new MenuItem("moveMode", "Move mode").SetValue(new StringList(new[] { "Orbwalk", "Move to Mouse", "Nothing" }));
-            noMoveRange = new MenuItem("noMoveRange", "No move/Attack range").SetValue(new Slider(600, 200, 600)).SetTooltip("Range that make the hero stops moving to enemy and starts orbwalking."); ;
+            noMoveRange = new MenuItem("noMoveRange", "No move/Attack range").SetValue(new Slider(600, 200, 600)).SetTooltip("Range that make the hero stops moving to enemy and starts orbwalking.");
 
             magicItems = new Menu("Magic Damage Items", "Magic Damage Items");
             popLinkensItems = new Menu("Pop Linkens Items", "Pop Linkens Items");
