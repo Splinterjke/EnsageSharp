@@ -75,19 +75,19 @@ namespace SkyWrathSharp
                 CastAbility(bolt, bolt.GetCastRange());
                 CastUltimate(mysticflare);
 
-                UseItem(atos, atos.GetCastRange(), 200);
+                UseItem(atos, atos.GetCastRange(), 140);
+                
                 UseItem(orchid, orchid.GetCastRange());
                 UseItem(veil, veil.GetCastRange());
                 if (!target.HasModifier("modifier_skywrath_mage_ancient_seal") && silence.CanBeCasted() && Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(silence.Name))
                     UseItem(ethereal, silence.GetCastRange());
-                else
-                    UseItem(ethereal, ethereal.GetCastRange());
+                else UseItem(ethereal, ethereal.GetCastRange());
+
                 UseItem(dagon, dagon.GetCastRange());
                 UseItem(shivas, shivas.GetCastRange());
-                
-                Moving();
-                Utils.Sleep(200, "combosleep");
 
+                Moving();
+                Utils.Sleep(150, "combosleep");
             }
         }
 
@@ -122,6 +122,7 @@ namespace SkyWrathSharp
 
         private static void TargetIndicator(EventArgs args)
         {
+            if (!Menu.Item("drawTarget").GetValue<bool>()) return;
             if (target != null && target.IsValid && !target.IsIllusion && target.IsAlive && target.IsVisible)
                 DrawTarget();
             else if (circle != null)
@@ -167,7 +168,7 @@ namespace SkyWrathSharp
             if (ability == null || !ability.CanBeCasted() || target.IsMagicImmune() ||
                 !(target.NetworkPosition.Distance2D(me) - target.RingRadius <= range) ||
                 !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(ability.Name)) return;
-            
+
             if (ability.IsAbilityBehavior(AbilityBehavior.UnitTarget))
             {
                 ability.UseAbility(target);
@@ -180,13 +181,17 @@ namespace SkyWrathSharp
 
         private static void CastUltimate(Ability ulti)
         {
-            if (!Utils.SleepCheck("ulti") ||
-                ulti == null ||
-               !ulti.CanBeCasted() ||
-                target.MovementSpeed > 280 ||
-                target.HasModifier("modifier_rune_haste") ||
-                target.IsMagicImmune() ||
-               !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare")) return;
+            if (!Utils.SleepCheck("ulti")
+                || !Utils.SleepCheck("etherealsleep") || ethereal.CanBeCasted()
+                || silence.CanBeCasted()
+                || veil.CanBeCasted()
+                || orchid.CanBeCasted()
+                || ulti == null
+                || !ulti.CanBeCasted()
+                || target.MovementSpeed > 280
+                || target.HasModifier("modifier_rune_haste")
+                || target.IsMagicImmune()
+                || !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare")) return;
 
             if (!target.CanMove() || target.NetworkActivity == NetworkActivity.Idle ||
                 target.UnitState.HasFlag(UnitState.Frozen) || target.UnitState.HasFlag(UnitState.Stunned))
@@ -209,12 +214,12 @@ namespace SkyWrathSharp
                 !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(item.Name))
                 return;
 
-            if (item.IsAbilityBehavior(AbilityBehavior.UnitTarget) && !Equals(item, dagon))
+            if (item.IsAbilityBehavior(AbilityBehavior.UnitTarget) && !Equals(item, dagon) && !Equals(item, ethereal))
             {
                 item.UseAbility(target);
                 return;
             }
-            
+
             if (item.IsAbilityBehavior(AbilityBehavior.Point))
             {
                 item.UseAbility(target.NetworkPosition);
@@ -227,10 +232,18 @@ namespace SkyWrathSharp
                 return;
             }
 
-            if ((!silence.CanBeCasted() | !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(silence.Name)) ||
-                (!veil.CanBeCasted() | !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(veil.Name))
-               /* || ((!ethereal.CanBeCasted() && target.HasModifier("modifier_item_ethereal_blade_slow")) | !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(ethereal.Name))*/)
+            if (Equals(item, dagon) &&
+                ((!silence.CanBeCasted() | !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(silence.Name)) ||
+                 (!veil.CanBeCasted() | !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(veil.Name)))
+                /* || ((!ethereal.CanBeCasted() && target.HasModifier("modifier_item_ethereal_blade_slow")) | !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(ethereal.Name))*/)
+            {
                 item.UseAbility(target);
+                return;
+            }
+
+            if (!Equals(item, ethereal)) return;
+            item.UseAbility(target);
+            Utils.Sleep(me.NetworkPosition.Distance2D(target.NetworkPosition) * 1.2, "etherealsleep");
         }
 
         private static void PopLinkens(Ability item)
