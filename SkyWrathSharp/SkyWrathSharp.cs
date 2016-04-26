@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Ensage;
 using Ensage.Common;
@@ -41,7 +42,7 @@ namespace SkyWrathSharp
                 me = ObjectManager.LocalHero;
                 return;
             }
-
+            
             target = me.ClosestToMouseTarget(600);
 
             if (!Game.IsKeyDown(Menu.Item("comboKey").GetValue<KeyBind>().Key) || Game.IsChatOpen) return;
@@ -73,7 +74,7 @@ namespace SkyWrathSharp
                 CastAbility(silence, silence.GetCastRange());
                 CastAbility(slow, 1600);
                 CastAbility(bolt, bolt.GetCastRange());
-                CastUltimate(mysticflare);
+                CastUltimate();
 
                 UseItem(atos, atos.GetCastRange(), 140);
                 
@@ -108,7 +109,7 @@ namespace SkyWrathSharp
             slow = me.FindSpell("skywrath_mage_concussive_shot");
             silence = me.FindSpell("skywrath_mage_ancient_seal");
             mysticflare = me.FindSpell("skywrath_mage_mystic_flare");
-            Utils.Sleep(5000, "GetAbilities");
+            Utils.Sleep(1000, "GetAbilities");
         }
 
         private static bool HasModifiers()
@@ -179,15 +180,15 @@ namespace SkyWrathSharp
             }
         }
 
-        private static void CastUltimate(Ability ulti)
+        private static void CastUltimate()
         {
             if (!Utils.SleepCheck("ulti")
                 || !Utils.SleepCheck("etherealsleep") || ethereal.CanBeCasted()
                 || silence.CanBeCasted()
                 || veil.CanBeCasted()
                 || orchid.CanBeCasted()
-                || ulti == null
-                || !ulti.CanBeCasted()
+                || mysticflare == null
+                || !mysticflare.CanBeCasted()
                 || target.MovementSpeed > 280
                 || target.HasModifier("modifier_rune_haste")
                 || target.IsMagicImmune()
@@ -197,12 +198,14 @@ namespace SkyWrathSharp
                 target.UnitState.HasFlag(UnitState.Frozen) || target.UnitState.HasFlag(UnitState.Stunned))
                 mysticflare.UseAbility(target.NetworkPosition);
             else
-                mysticflare.UseAbility(Prediction.PredictedXYZ(target, 220 / target.MovementSpeed * 1000));
+                if (target.UnitState.HasFlag(UnitState.Hexed))
+                mysticflare.UseAbility(Prediction.PredictedXYZ(target, 210 / target.MovementSpeed * 1000));
+            else mysticflare.UseAbility(Prediction.PredictedXYZ(target, 230 / target.MovementSpeed * 1000));
             if (target.Health <= target.DamageTaken(mysticflare.GetAbilityData("damage"), DamageType.Magical, me))
-                Utils.Sleep(2500, "ulti");
+                Utils.Sleep(1000, "ulti");
         }
 
-        //private static void NonUltiCasting()
+        //private static bool NonUltiCasting()
         //{
 
         //}

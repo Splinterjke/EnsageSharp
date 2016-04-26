@@ -14,11 +14,13 @@ namespace SkyWrathSharp
             drawTarget = new MenuItem("drawTarget", "Target indicator").SetValue(true);
             moveMode = new MenuItem("moveMode", "Move mode").SetValue(new StringList(new[] { "Orbwalk", "Move to Mouse", "Nothing" }));
             noMoveRange = new MenuItem("noMoveRange", "No move/Attack range").SetValue(new Slider(600, 200, 600)).SetTooltip("Range that make the hero stops moving to enemy and starts orbwalking.");
+            //comboOrder = new MenuItem("comboOrder", "Combo order").SetValue(new PriorityChanger(comboOrderDictionary));
 
             magicItems = new Menu("Magic Damage Items", "Magic Damage Items");
             popLinkensItems = new Menu("Pop Linkens Items", "Pop Linkens Items");
             abilities = new Menu("Abilities", "Abilities");
 
+            //Menu.AddItem(comboOrder);
             Menu.AddItem(comboKey);
             Menu.AddItem(soulRing);
             Menu.AddItem(bladeMail);

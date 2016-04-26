@@ -18,20 +18,9 @@ namespace SkyWrathSharp
             "modifier_item_lotus_orb_active"
         };
 
-        //public static Dictionary<string, uint> damageOrderDictionary = new Dictionary<string, uint>
-        //{
-        //    {"item_rod_of_atos", 0},
-        //    {"item_dagon", 4},
-        //    {"item_sheepstick", 0},
-        //    {"item_orchid", 1},
-        //    {"item_veil_of_discord", 1},
-        //    {"item_ethereal_blade", 2},
-        //    {"item_shivas_guard", 5},
-        //    {"skywrath_mage_arcane_bolt", 3},
-        //    {"skywrath_mage_concussive_shot", 3},
-        //    {"skywrath_mage_ancient_seal", 1},
-        //    {"skywrath_mage_mystic_flare", 4}
-        //};
+        //public static List<string> comboOrderDictionary = new List<string>();
+
+        public static Dictionary<string, Ability> Abilities;
 
         public static Dictionary<string, bool> abilitiesDictionary = new Dictionary<string, bool>
         {
@@ -73,6 +62,8 @@ namespace SkyWrathSharp
 
         public static Menu modifiers;
 
+        public static MenuItem comboOrder;
+
         public static MenuItem comboKey;
 
         public static MenuItem drawTarget;
@@ -89,7 +80,9 @@ namespace SkyWrathSharp
 
         public static Ability bolt, slow, silence, mysticflare;
 
-        public static Item soulring, force_staff, cyclone, orchid, sheep, veil, shivas, dagon, atos, ethereal;
+        public static Item soulring, force_staff, cyclone, orchid;
+        public static Item sheep;
+        public static Item veil, shivas, dagon, atos, ethereal;
 
         public static Hero me, target;
 
