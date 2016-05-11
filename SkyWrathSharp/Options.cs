@@ -14,13 +14,12 @@ namespace SkyWrathSharp
             drawTarget = new MenuItem("drawTarget", "Target indicator").SetValue(true);
             moveMode = new MenuItem("moveMode", "Move mode").SetValue(new StringList(new[] { "Orbwalk", "Move to Mouse", "Nothing" }));
             noMoveRange = new MenuItem("noMoveRange", "No move/Attack range").SetValue(new Slider(600, 200, 600)).SetTooltip("Range that make the hero stops moving to enemy and starts orbwalking.");
-            //comboOrder = new MenuItem("comboOrder", "Combo order").SetValue(new PriorityChanger(comboOrderDictionary));
-
+            
+            noCastUlti = new Menu("Ultimate usage", "Ultimate usage");
             magicItems = new Menu("Magic Damage Items", "Magic Damage Items");
             popLinkensItems = new Menu("Pop Linkens Items", "Pop Linkens Items");
             abilities = new Menu("Abilities", "Abilities");
-
-            //Menu.AddItem(comboOrder);
+            
             Menu.AddItem(comboKey);
             Menu.AddItem(soulRing);
             Menu.AddItem(bladeMail);
@@ -31,6 +30,7 @@ namespace SkyWrathSharp
             Menu.AddSubMenu(magicItems);
             Menu.AddSubMenu(popLinkensItems);
             Menu.AddSubMenu(abilities);
+            Menu.AddSubMenu(noCastUlti);
 
             magicItems.AddItem(
                 new MenuItem("magicItems", "Magic Damage").SetValue(
@@ -40,6 +40,9 @@ namespace SkyWrathSharp
                     new AbilityToggler(popLinkensDictionary)));
             abilities.AddItem(new MenuItem("abilities", "Abilities").SetValue(
                 new AbilityToggler(abilitiesDictionary)));
+
+            noCastUlti.AddItem(
+                new MenuItem("noCastUlti", "Do not use ulti if % of enemy's HP is below: ").SetValue(new Slider(35)));
 
             Menu.AddToMainMenu();
         }

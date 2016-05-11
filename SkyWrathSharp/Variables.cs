@@ -60,7 +60,9 @@ namespace SkyWrathSharp
 
         public static Menu abilities;
 
-        public static Menu modifiers;
+        //public static Menu modifiers;
+
+        public static Menu noCastUlti;
 
         public static MenuItem comboOrder;
 
@@ -80,9 +82,7 @@ namespace SkyWrathSharp
 
         public static Ability bolt, slow, silence, mysticflare;
 
-        public static Item soulring, force_staff, cyclone, orchid;
-        public static Item sheep;
-        public static Item veil, shivas, dagon, atos, ethereal;
+        public static Item soulring, force_staff, cyclone, orchid, sheep, veil, shivas, dagon, atos, ethereal;
 
         public static Hero me, target;
 

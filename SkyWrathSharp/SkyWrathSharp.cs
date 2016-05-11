@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Ensage;
 using Ensage.Common;
@@ -42,7 +41,7 @@ namespace SkyWrathSharp
                 me = ObjectManager.LocalHero;
                 return;
             }
-            
+
             target = me.ClosestToMouseTarget(600);
 
             if (!Game.IsKeyDown(Menu.Item("comboKey").GetValue<KeyBind>().Key) || Game.IsChatOpen) return;
@@ -77,7 +76,7 @@ namespace SkyWrathSharp
                 CastUltimate();
 
                 UseItem(atos, atos.GetCastRange(), 140);
-                
+
                 UseItem(orchid, orchid.GetCastRange());
                 UseItem(veil, veil.GetCastRange());
                 if (!target.HasModifier("modifier_skywrath_mage_ancient_seal") && silence.CanBeCasted() && Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(silence.Name))
@@ -124,7 +123,7 @@ namespace SkyWrathSharp
         private static void TargetIndicator(EventArgs args)
         {
             if (!Menu.Item("drawTarget").GetValue<bool>()) return;
-            if (target != null && target.IsValid && !target.IsIllusion && target.IsAlive && target.IsVisible)
+            if (target != null && target.IsValid && !target.IsIllusion && target.IsAlive && target.IsVisible && me.IsAlive)
                 DrawTarget();
             else if (circle != null)
             {
@@ -192,7 +191,8 @@ namespace SkyWrathSharp
                 || target.MovementSpeed > 280
                 || target.HasModifier("modifier_rune_haste")
                 || target.IsMagicImmune()
-                || !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare")) return;
+                || !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare")
+                || target.Health/target.MaximumHealth*100 < Menu.Item("noCastUlti").GetValue<Slider>().Value) return;
 
             if (!target.CanMove() || target.NetworkActivity == NetworkActivity.Idle ||
                 target.UnitState.HasFlag(UnitState.Frozen) || target.UnitState.HasFlag(UnitState.Stunned))
@@ -258,17 +258,21 @@ namespace SkyWrathSharp
 
         private static void Moving()
         {
-            switch (moveMode.GetValue<StringList>().SelectedIndex)
+            switch (moveMode.GetValue<StringList>().SelectedValue)
             {
-                case 0:
-                    Orbwalking.Orbwalk(target, bonusRange: -me.AttackRange + Menu.Item("noMoveRange").GetValue<Slider>().Value);
+                case "Orbwalk":
+                    //if (!Utils.SleepCheck("attackDelay"))
+                    //{
+                    //    me.Move(target.NetworkPosition);
+                    //    break;
+                    //}
+                    Orbwalking.Orbwalk(target);
+                    //Utils.Sleep((int)(me.SecondsPerAttack * 1000), "attackDelay");
+                    break;                    
+                case "Move to Mouse":
+                    me.Move(Game.MousePosition);
                     break;
-
-                case 1:
-                    me.Move(Game.MousePosition, false);
-                    break;
-
-                case 2:
+                case "Nothing":
                     return;
             }
         }
