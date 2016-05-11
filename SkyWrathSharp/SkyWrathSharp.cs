@@ -122,7 +122,13 @@ namespace SkyWrathSharp
 
         private static void TargetIndicator(EventArgs args)
         {
-            if (!Menu.Item("drawTarget").GetValue<bool>()) return;
+            if (!Menu.Item("drawTarget").GetValue<bool>())
+            {
+                if (circle == null) return;
+                circle.Dispose();
+                circle = null;
+                return;
+            }
             if (target != null && target.IsValid && !target.IsIllusion && target.IsAlive && target.IsVisible && me.IsAlive)
                 DrawTarget();
             else if (circle != null)
@@ -192,7 +198,7 @@ namespace SkyWrathSharp
                 || target.HasModifier("modifier_rune_haste")
                 || target.IsMagicImmune()
                 || !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare")
-                || target.Health/target.MaximumHealth*100 < Menu.Item("noCastUlti").GetValue<Slider>().Value) return;
+                || target.Health / target.MaximumHealth * 100 < Menu.Item("noCastUlti").GetValue<Slider>().Value) return;
 
             if (!target.CanMove() || target.NetworkActivity == NetworkActivity.Idle ||
                 target.UnitState.HasFlag(UnitState.Frozen) || target.UnitState.HasFlag(UnitState.Stunned))
@@ -268,7 +274,7 @@ namespace SkyWrathSharp
                     //}
                     Orbwalking.Orbwalk(target);
                     //Utils.Sleep((int)(me.SecondsPerAttack * 1000), "attackDelay");
-                    break;                    
+                    break;
                 case "Move to Mouse":
                     me.Move(Game.MousePosition);
                     break;
