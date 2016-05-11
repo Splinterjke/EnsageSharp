@@ -204,17 +204,33 @@ namespace SkyWrathSharp
                 target.UnitState.HasFlag(UnitState.Frozen) || target.UnitState.HasFlag(UnitState.Stunned))
                 mysticflare.UseAbility(target.NetworkPosition);
             else
-                if (target.UnitState.HasFlag(UnitState.Hexed))
-                mysticflare.UseAbility(Prediction.PredictedXYZ(target, 210 / target.MovementSpeed * 1000));
-            else mysticflare.UseAbility(Prediction.PredictedXYZ(target, 230 / target.MovementSpeed * 1000));
-            if (target.Health <= target.DamageTaken(mysticflare.GetAbilityData("damage"), DamageType.Magical, me))
-                Utils.Sleep(1000, "ulti");
+                GetPrediction();
         }
 
-        //private static bool NonUltiCasting()
-        //{
+        private static void GetPrediction()
+        {
+            switch (predictionType.GetValue<StringList>().SelectedIndex)
+            {
+                case 0:
+                    if (target.UnitState.HasFlag(UnitState.Hexed))
+                    {
+                        mysticflare.UseAbility(Prediction.InFront(target, 142));
+                        break;
+                    }
+                    mysticflare.UseAbility(Prediction.InFront(target, 155));
+                    break;
 
-        //}
+                case 1:
+                    if (target.UnitState.HasFlag(UnitState.Hexed))
+                    {
+                        mysticflare.UseAbility(Prediction.PredictedXYZ(target, 210/target.MovementSpeed*1000));
+                        break;
+                    }
+                    mysticflare.UseAbility(Prediction.PredictedXYZ(target, 230/target.MovementSpeed*1000));
+                    break;
+            }
+
+        }
 
         private static void UseItem(Item item, float range, int speed = 0)
         {

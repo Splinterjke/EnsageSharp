@@ -18,8 +18,6 @@ namespace SkyWrathSharp
             "modifier_item_lotus_orb_active"
         };
 
-        //public static List<string> comboOrderDictionary = new List<string>();
-
         public static Dictionary<string, Ability> Abilities;
 
         public static Dictionary<string, bool> abilitiesDictionary = new Dictionary<string, bool>
@@ -60,8 +58,6 @@ namespace SkyWrathSharp
 
         public static Menu abilities;
 
-        //public static Menu modifiers;
-
         public static Menu noCastUlti;
 
         public static MenuItem comboOrder;
@@ -73,6 +69,8 @@ namespace SkyWrathSharp
         public static MenuItem moveMode;
 
         public static MenuItem noMoveRange;
+
+        public static MenuItem predictionType;
 
         public static MenuItem soulRing;
 

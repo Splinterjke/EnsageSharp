@@ -1,4 +1,5 @@
 ﻿using Ensage.Common.Menu;
+using SharpDX;
 
 namespace SkyWrathSharp
 {
@@ -13,6 +14,7 @@ namespace SkyWrathSharp
             bladeMail = new MenuItem("bladeMail", "Check for BladeMail").SetValue(false);
             drawTarget = new MenuItem("drawTarget", "Target indicator").SetValue(true);
             moveMode = new MenuItem("moveMode", "Move mode").SetValue(new StringList(new[] { "Orbwalk", "Move to Mouse", "Nothing" }));
+            predictionType = new MenuItem("predictionType", "Ultimate prediction").SetValue(new StringList(new[] { "InFront", "By MS/Direction"})).SetTooltip("'InFront' does cast ulti in front of enemy, 'By MS/Direction' calculates movespeed and future target position.");
             noMoveRange = new MenuItem("noMoveRange", "No move/Attack range").SetValue(new Slider(600, 200, 600)).SetTooltip("Range that make the hero stops moving to enemy and starts orbwalking.");
             
             noCastUlti = new Menu("Ultimate usage", "Ultimate usage");
@@ -25,6 +27,7 @@ namespace SkyWrathSharp
             Menu.AddItem(bladeMail);
             Menu.AddItem(drawTarget);
             Menu.AddItem(moveMode);
+            Menu.AddItem(predictionType);
             Menu.AddItem(noMoveRange);
 
             Menu.AddSubMenu(magicItems);
