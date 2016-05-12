@@ -199,7 +199,7 @@ namespace SkyWrathSharp
                 || target.HasModifier("modifier_rune_haste")
                 || target.IsMagicImmune()
                 || !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare")
-                || (int)(target.Health / target.MaximumHealth * 100) < Menu.Item("noCastUlti").GetValue<Slider>().Value) return;
+                || target.Health * 100 / target.MaximumHealth < Menu.Item("noCastUlti").GetValue<Slider>().Value) return;
 
             if (!target.CanMove() || target.NetworkActivity == NetworkActivity.Idle ||
                 target.UnitState.HasFlag(UnitState.Frozen) || target.UnitState.HasFlag(UnitState.Stunned))
