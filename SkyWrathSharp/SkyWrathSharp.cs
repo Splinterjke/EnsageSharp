@@ -32,7 +32,7 @@ namespace SkyWrathSharp
 
                 loaded = true;
                 Game.PrintMessage(
-                    "<font face='Calibri Bold'><font color='#fff511'>SkyWrathRage is Injected</font> (credits to <font color='#999999'>Splinter)</font>",
+                    "<font face='Calibri Bold'><font color='#fff511'>" + AssemblyName + " is Injected</font> (credits to <font color='#999999'>Splinter)</font>",
                     MessageType.LogMessage);
             }
 
