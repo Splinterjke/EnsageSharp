@@ -1,5 +1,4 @@
 ﻿using Ensage.Common.Menu;
-using SharpDX;
 
 namespace SkyWrathSharp
 {
