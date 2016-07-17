@@ -24,7 +24,7 @@ namespace SkyWrathSharp
             if (!loaded)
             {
                 me = ObjectManager.LocalHero;
-                if (!Game.IsInGame || me == null || me.ClassID != ClassID.CDOTA_Unit_Hero_Skywrath_Mage)
+                if (!Game.IsInGame || me == null || me.Name != "npc_dota_hero_skywrath_mage")
                 {
                     return;
                 }
@@ -257,7 +257,7 @@ namespace SkyWrathSharp
                 return;
             }
 
-            if (Equals(item, dagon) &&
+            if (item.Name.Contains("item_dagon") &&
                 ((!silence.CanBeCasted() | !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(silence.Name)) ||
                  (!veil.CanBeCasted() | !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(veil.Name)))
                 /* || ((!ethereal.CanBeCasted() && target.HasModifier("modifier_item_ethereal_blade_slow")) | !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(ethereal.Name))*/)
@@ -268,7 +268,6 @@ namespace SkyWrathSharp
 
             if (!Equals(item, ethereal)) return;
             item.UseAbility(target);
-            Utils.Sleep(me.NetworkPosition.Distance2D(target.NetworkPosition) * 1.2, "etherealsleep");
         }
 
         private static void PopLinkens(Ability item)
