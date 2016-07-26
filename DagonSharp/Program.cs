@@ -9,15 +9,13 @@ namespace DagonSharp
 {
     internal class Program
     {
-        private static Hero me;
+        private static Hero me, target;
 
         private static Item dagon;
 
         private static bool loaded;
 
         private static readonly Menu Menu = new Menu("DagonSharp", "DagonSharp", true);
-
-        private static readonly int[] DagonDamage = { 400, 500, 600, 700, 800 };
 
         private static readonly string[] IgnoreModifiers = {
             "modifier_templar_assassin_refraction_absorb",
@@ -30,20 +28,23 @@ namespace DagonSharp
 
         private static void Main()
         {
-            Menu.AddItem(new MenuItem("key", "Enabled").SetValue(new KeyBind('K', KeyBindType.Toggle, true)));
+            Menu.AddItem(new MenuItem("toggle", "Toggle button").SetValue(new KeyBind('F', KeyBindType.Toggle, true)));
             Menu.AddToMainMenu();
 
             Game.OnUpdate += Game_OnUpdate;
+            Events.OnLoad += OnLoad;
+            Events.OnClose += OnClose;
         }
 
-
-        private static void Game_OnUpdate(EventArgs args)
+        private static void OnClose(object sender, EventArgs e)
         {
-            if (!Game.IsInGame || Game.IsPaused || Game.IsChatOpen || Game.IsWatchingGame || !Utils.SleepCheck("dagonDelay"))
-            {
-                return;
-            }
+            loaded = false;
+            me = null;
+            target = null;
+        }
 
+        private static void OnLoad(object sender, EventArgs e)
+        {
             if (!loaded)
             {
                 me = ObjectManager.LocalHero;
@@ -54,20 +55,32 @@ namespace DagonSharp
                 }
 
                 loaded = true;
+                Game.PrintMessage(
+                    "<font face='Calibri Bold'><font color='#fff511'>DagonSharp is Injected</font> (credits to <font color='#999999'>Splinter)</font>",
+                    MessageType.LogMessage);
             }
 
-            if (me.IsChanneling() || me.IsInvisible() || !Menu.Item("key").GetValue<KeyBind>().Active) return;
+            if (me == null || !me.IsValid)
+                loaded = false;
+        }
+
+        private static void Game_OnUpdate(EventArgs args)
+        {
+            if (!Game.IsInGame || Game.IsPaused || Game.IsChatOpen || Game.IsWatchingGame || !Utils.SleepCheck("updaterate"))
+                return;
+
+            if (me.IsChanneling() || me.IsInvisible() || !Menu.Item("toggle").GetValue<KeyBind>().Active) return;
             dagon = me.GetDagon();
-            var target = ObjectManager.GetEntities<Hero>().FirstOrDefault(CheckTarget);
+            target = ObjectManager.GetEntities<Hero>().FirstOrDefault(CheckTarget);
 
             if (dagon == null || target == null || !me.CanUseItems() || !dagon.CanBeCasted()) return;
             dagon.UseAbility(target);
-            Utils.Sleep(100, "dagonDelay");
+            Utils.Sleep(100, "updaterate");
         }
 
         private static bool CheckTarget(Unit enemy)
         {
-            if (enemy.IsIllusion || !enemy.IsValidTarget(dagon.GetCastRange(), true, me.NetworkPosition))
+            if (enemy == null || enemy.IsIllusion || !enemy.IsValidTarget(dagon.GetCastRange(), true, me.NetworkPosition))
                 return false;
 
             if (enemy.IsLinkensProtected() || enemy.IsMagicImmune())
@@ -78,10 +91,10 @@ namespace DagonSharp
 
             if (me.FindItem("item_aether_lens") != null)
                 return enemy.Health <
-                       enemy.DamageTaken(DagonDamage[dagon.Level - 1] + DagonDamage[dagon.Level - 1] * ((me.TotalIntelligence / 16 + 5) * 0.01f), DamageType.Magical, me);
+                       enemy.DamageTaken(dagon.GetAbilityData("damage") + dagon.GetAbilityData("damage") * ((me.TotalIntelligence / 16 + 5) * 0.01f), DamageType.Magical, me);
 
             return enemy.Health <
-                   enemy.DamageTaken(DagonDamage[dagon.Level - 1] + DagonDamage[dagon.Level - 1] * (me.TotalIntelligence / 16 * 0.01f), DamageType.Magical, me);
+                   enemy.DamageTaken(dagon.GetAbilityData("damage") + dagon.GetAbilityData("damage") * (me.TotalIntelligence / 16 * 0.01f), DamageType.Magical, me);
         }
     }
 }
