@@ -14,7 +14,7 @@ namespace SkyWrathSharp
             drawTarget = new MenuItem("drawTarget", "Target indicator").SetValue(true);
             moveMode = new MenuItem("moveMode", "Orbwalk").SetValue(true);
             predictionType = new MenuItem("predictionType", "Ultimate prediction").SetValue(new StringList(new[] { "InFront", "By MS/Direction"}));
-            ezKillCheck = new MenuItem("ezKillCheck", "Check for EZ Kill (coming soon)").SetValue(false).SetTooltip("Check if an enemy is ez-killable (low-mana costs and the fastest way to slay an enemy.");
+            ezKillCheck = new MenuItem("ezKillCheck", "Check for EZ Kill (beta)").SetValue(false).SetTooltip("Check if an enemy is ez-killable (low-mana costs and the fastest way to slay an enemy.");
             straightTimeCheck = new MenuItem("straightTimeCheck", "Straight time before ulti").SetValue(new Slider(0, 0, 2)).SetTooltip("At least time enemy's moving in straight before casting ulti.");
             ClosestToMouseRange = new MenuItem("ClosestToMouseRange", "Closest to mouse range").SetValue(new Slider(600, 500, 1200)).SetTooltip("Range that makes assembly checking for enemy in selected range.");
             
