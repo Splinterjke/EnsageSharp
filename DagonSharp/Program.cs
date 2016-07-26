@@ -89,12 +89,8 @@ namespace DagonSharp
             if (!enemy.CanDie() || enemy.Modifiers.Any(x => IgnoreModifiers.Any(x.Name.Equals)))
                 return false;
 
-            if (me.FindItem("item_aether_lens") != null)
-                return enemy.Health <
-                       enemy.DamageTaken(dagon.GetAbilityData("damage") + dagon.GetAbilityData("damage") * ((me.TotalIntelligence / 16 + 5) * 0.01f), DamageType.Magical, me);
-
-            return enemy.Health <
-                   enemy.DamageTaken(dagon.GetAbilityData("damage") + dagon.GetAbilityData("damage") * (me.TotalIntelligence / 16 * 0.01f), DamageType.Magical, me);
+           return enemy.Health <
+                   enemy.SpellDamageTaken(dagon.GetAbilityData("damage"), DamageType.Magical, me, dagon.Name);
         }
     }
 }
