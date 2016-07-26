@@ -47,13 +47,13 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Ensage">
-      <HintPath>..\..\..\PlaySharp NEW\System\Ensage.dll</HintPath>
+      <HintPath>D:\PlaySharp NEW\References\Ensage.dll</HintPath>
     </Reference>
     <Reference Include="Ensage.Common">
-      <HintPath>..\..\..\PlaySharp NEW\System\Ensage.Common.dll</HintPath>
+      <HintPath>D:\PlaySharp NEW\References\Ensage.Common.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>..\..\..\PlaySharp NEW\System\SharpDX.dll</HintPath>
+      <HintPath>D:\PlaySharp NEW\References\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />

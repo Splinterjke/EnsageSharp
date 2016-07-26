@@ -8,13 +8,15 @@ namespace SkyWrathSharp
         {
             heroName = "npc_dota_hero_skywrath_mage";
             Menu = new Menu(AssemblyName, AssemblyName, true, heroName, true);
-            comboKey = new MenuItem("comboKey", "Combo").SetValue(new KeyBind(32, KeyBindType.Press));
+            comboKey = new MenuItem("comboKey", "Combo Key").SetValue(new KeyBind(32, KeyBindType.Press));
             soulRing = new MenuItem("soulRing", "Soulring").SetValue(true).SetTooltip("Use soulring before use the combo if your HP is greater than 150.");
             bladeMail = new MenuItem("bladeMail", "Check for BladeMail").SetValue(false);
             drawTarget = new MenuItem("drawTarget", "Target indicator").SetValue(true);
-            moveMode = new MenuItem("moveMode", "Move mode").SetValue(new StringList(new[] { "Orbwalk", "Move to Mouse", "Nothing" }));
-            predictionType = new MenuItem("predictionType", "Ultimate prediction").SetValue(new StringList(new[] { "InFront", "By MS/Direction"})).SetTooltip("'InFront' does cast ulti in front of enemy, 'By MS/Direction' calculates movespeed and future target position.");
-            noMoveRange = new MenuItem("noMoveRange", "No move/Attack range").SetValue(new Slider(600, 200, 600)).SetTooltip("Range that make the hero stops moving to enemy and starts orbwalking.");
+            moveMode = new MenuItem("moveMode", "Orbwalk").SetValue(true);
+            predictionType = new MenuItem("predictionType", "Ultimate prediction").SetValue(new StringList(new[] { "InFront", "By MS/Direction"}));
+            ezKillCheck = new MenuItem("ezKillCheck", "Check for EZ Kill (coming soon)").SetValue(false).SetTooltip("Check if an enemy is ez-killable (low-mana costs and the fastest way to slay an enemy.");
+            straightTimeCheck = new MenuItem("straightTimeCheck", "Straight time before ulti").SetValue(new Slider(0, 0, 2)).SetTooltip("At least time enemy's moving in straight before casting ulti.");
+            ClosestToMouseRange = new MenuItem("ClosestToMouseRange", "Closest to mouse range").SetValue(new Slider(600, 500, 1200)).SetTooltip("Range that makes assembly checking for enemy in selected range.");
             
             noCastUlti = new Menu("Ultimate usage", "Ultimate usage");
             magicItems = new Menu("Magic Damage Items", "Magic Damage Items");
@@ -27,7 +29,9 @@ namespace SkyWrathSharp
             Menu.AddItem(drawTarget);
             Menu.AddItem(moveMode);
             Menu.AddItem(predictionType);
-            Menu.AddItem(noMoveRange);
+            Menu.AddItem(ezKillCheck);
+            Menu.AddItem(straightTimeCheck);
+            Menu.AddItem(ClosestToMouseRange);
 
             Menu.AddSubMenu(magicItems);
             Menu.AddSubMenu(popLinkensItems);

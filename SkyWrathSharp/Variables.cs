@@ -30,21 +30,24 @@ namespace SkyWrathSharp
 
         public static Dictionary<string, bool> popLinkensDictionary = new Dictionary<string, bool>
         {
+            {"item_medallion_of_courage", true},
             {"item_rod_of_atos", true},
             {"item_sheepstick", true},
             {"item_force_staff", true},
             {"item_cyclone", true},
             {"item_orchid", true},
-            {"item_dagon", true},
+            {"item_bloodthorn", true},
             {"skywrath_mage_ancient_seal", true}
         };
 
         public static Dictionary<string, bool> magicItemsDictionary = new Dictionary<string, bool>
         {
+            {"item_medallion_of_courage", true},
             {"item_rod_of_atos", true},
             {"item_dagon", true},
             {"item_sheepstick", true},
             {"item_orchid", true},
+            {"item_bloodthorn", true},
             {"item_veil_of_discord", true},
             {"item_ethereal_blade", true},
             {"item_shivas_guard", true}
@@ -68,7 +71,11 @@ namespace SkyWrathSharp
 
         public static MenuItem moveMode;
 
-        public static MenuItem noMoveRange;
+        public static MenuItem ezKillCheck;
+
+        public static MenuItem straightTimeCheck;
+
+        public static MenuItem ClosestToMouseRange;
 
         public static MenuItem predictionType;
 
@@ -80,7 +87,7 @@ namespace SkyWrathSharp
 
         public static Ability bolt, slow, silence, mysticflare;
 
-        public static Item soulring, force_staff, cyclone, orchid, sheep, veil, shivas, dagon, atos, ethereal;
+        public static Item soulring, force_staff, cyclone, orchid, sheep, veil, shivas, dagon, atos, ethereal, medal, bloodthorn;
 
         public static Hero me, target;
 
