@@ -8,7 +8,8 @@ namespace SkyWrathSharp
         {
             heroName = "npc_dota_hero_skywrath_mage";
             Menu = new Menu(AssemblyName, AssemblyName, true, heroName, true);
-            comboKey = new MenuItem("comboKey", "Combo Key").SetValue(new KeyBind(32, KeyBindType.Press));
+            comboKey = new MenuItem("comboKey", "Combo Key").SetValue(new KeyBind(70, KeyBindType.Press));
+            harassKey = new MenuItem("harassKey", "Harass Key").SetValue(new KeyBind(68, KeyBindType.Press));
             soulRing = new MenuItem("soulRing", "Soulring").SetValue(true).SetTooltip("Use soulring before use the combo if your HP is greater than 150.");
             bladeMail = new MenuItem("bladeMail", "Check for BladeMail").SetValue(false);
             drawTarget = new MenuItem("drawTarget", "Target indicator").SetValue(true);
@@ -24,6 +25,7 @@ namespace SkyWrathSharp
             abilities = new Menu("Abilities", "Abilities");
             
             Menu.AddItem(comboKey);
+            Menu.AddItem(harassKey);
             Menu.AddItem(soulRing);
             Menu.AddItem(bladeMail);
             Menu.AddItem(drawTarget);

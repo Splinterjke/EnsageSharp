@@ -48,58 +48,71 @@ namespace SkyWrathSharp
 
         private static void ComboUsage(EventArgs args)
         {
-            if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame)
+            if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame || Game.IsChatOpen)
                 return;
 
             target = me.ClosestToMouseTarget(ClosestToMouseRange.GetValue<Slider>().Value);
 
-            if (!Game.IsKeyDown(comboKey.GetValue<KeyBind>().Key) || Game.IsChatOpen) return;
-
-            GetAbilities();
-
-            if (target == null || !target.IsValid || !target.IsVisible || target.IsIllusion || !target.IsAlive ||
-                me.IsChanneling() || target.IsInvul() || HasModifiers()) return;
-
-            if (target.IsLinkensProtected())
+            if (Game.IsKeyDown(comboKey.GetValue<KeyBind>().Key))
             {
-                PopLinkens(cyclone);
-                PopLinkens(force_staff);
-                PopLinkens(atos);
-                PopLinkens(sheep);
-                PopLinkens(orchid);
-                PopLinkens(dagon);
-                PopLinkens(silence);
+
+                GetAbilities();
+
+                if (target == null || !target.IsValid || !target.IsVisible || target.IsIllusion || !target.IsAlive ||
+                    me.IsChanneling() || target.IsInvul() || HasModifiers()) return;
+
+                if (target.IsLinkensProtected())
+                {
+                    PopLinkens(cyclone);
+                    PopLinkens(force_staff);
+                    PopLinkens(atos);
+                    PopLinkens(sheep);
+                    PopLinkens(orchid);
+                    PopLinkens(dagon);
+                    PopLinkens(silence);
+                }
+                else
+                {
+                    if (!Utils.SleepCheck("combosleep")) return;
+
+                    Orbwalk();
+
+                    if (soulring != null && soulring.CanBeCasted() && soulRing.GetValue<bool>())
+                        soulring.UseAbility();
+
+                    if (!target.UnitState.HasFlag(UnitState.Hexed) && !target.UnitState.HasFlag(UnitState.Stunned))
+                        UseItem(sheep, sheep.GetCastRange());
+
+                    CastAbility(silence, silence.GetCastRange());
+                    CastAbility(slow, slow.GetCastRange());
+                    CastAbility(bolt, bolt.GetCastRange());
+
+                    UseItem(atos, atos.GetCastRange(), 140);
+                    UseItem(medal, medal.GetCastRange());
+                    UseItem(orchid, orchid.GetCastRange());
+                    UseItem(bloodthorn, bloodthorn.GetCastRange());
+                    UseItem(veil, veil.GetCastRange());
+                    UseItem(ethereal, ethereal.GetCastRange());
+
+                    UseDagon();
+
+                    CastUltimate();
+
+                    UseItem(shivas, shivas.GetCastRange());
+
+                    Utils.Sleep(150, "combosleep");
+                }
             }
-            else
+
+            if (Game.IsKeyDown(harassKey.GetValue<KeyBind>().Key))
             {
-                if (!Utils.SleepCheck("combosleep")) return;
-
+                GetAbilities();
+                if (target == null || !target.IsValid || !target.IsVisible || target.IsIllusion || !target.IsAlive ||
+                    me.IsChanneling() || target.IsInvul() || HasModifiers()) return;
+                if (!Utils.SleepCheck("harasssleep")) return;
                 Orbwalk();
-
-                if (soulring != null && soulring.CanBeCasted() && soulRing.GetValue<bool>())
-                    soulring.UseAbility();
-
-                if (!target.UnitState.HasFlag(UnitState.Hexed) && !target.UnitState.HasFlag(UnitState.Stunned))
-                    UseItem(sheep, sheep.GetCastRange());
-
-                CastAbility(silence, silence.GetCastRange());
-                CastAbility(slow, slow.GetCastRange());
                 CastAbility(bolt, bolt.GetCastRange());
-
-                UseItem(atos, atos.GetCastRange(), 140);
-                UseItem(medal, medal.GetCastRange());
-                UseItem(orchid, orchid.GetCastRange());
-                UseItem(bloodthorn, bloodthorn.GetCastRange());
-                UseItem(veil, veil.GetCastRange());
-                UseItem(ethereal, ethereal.GetCastRange());
-
-                UseDagon();
-
-                CastUltimate();
-
-                UseItem(shivas, shivas.GetCastRange());
-
-                Utils.Sleep(150, "combosleep");
+                Utils.Sleep(150, "harasssleep");
             }
         }
 
@@ -207,7 +220,7 @@ namespace SkyWrathSharp
             || target.Health * 100 / target.MaximumHealth < Menu.Item("noCastUlti").GetValue<Slider>().Value
             || Prediction.StraightTime(target) / 1000 < straightTimeCheck.GetValue<Slider>().Value
             || IsEzKillable())
-            return;
+                return;
 
             if (!target.CanMove() || target.NetworkActivity == NetworkActivity.Disabled || target.NetworkActivity == NetworkActivity.Idle ||
                 target.UnitState.HasFlag(UnitState.Frozen) || target.UnitState.HasFlag(UnitState.Stunned))
@@ -223,10 +236,10 @@ namespace SkyWrathSharp
                 case 0:
                     if (target.UnitState.HasFlag(UnitState.Hexed))
                     {
-                        mysticflare.UseAbility(Prediction.InFront(target, 142));
+                        mysticflare.UseAbility(Prediction.InFront(target, 85));
                         break;
                     }
-                    mysticflare.UseAbility(Prediction.InFront(target, 155));
+                    mysticflare.UseAbility(Prediction.InFront(target, 92));
                     break;
 
                 case 1:
@@ -329,18 +342,18 @@ namespace SkyWrathSharp
 
             if (dagon != null && dagon.CanBeCasted()
                 /*Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled("item_dagon")*/)
-                totalDamage += (int) target.SpellDamageTaken(dagon.GetAbilityData("damage"),DamageType.Magical, me, dagon.Name, minusMagicResistancePerc: plusPerc);
+                totalDamage += (int)target.SpellDamageTaken(dagon.GetAbilityData("damage"), DamageType.Magical, me, dagon.Name, minusMagicResistancePerc: plusPerc);
 
             if (bolt != null && bolt.CanBeCasted() &&
                 Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(bolt.Name))
-                totalDamage += (int) target.SpellDamageTaken((bolt.GetAbilityData("bolt_damage") + me.TotalIntelligence * 1.6f)* 3, DamageType.Magical, me, bolt.Name, minusMagicResistancePerc: plusPerc);
+                totalDamage += (int)target.SpellDamageTaken((bolt.GetAbilityData("bolt_damage") + me.TotalIntelligence * 1.6f) * 3, DamageType.Magical, me, bolt.Name, minusMagicResistancePerc: plusPerc);
 
             if (slow != null && slow.CanBeCasted() &&
                 Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(slow.Name))
-                totalDamage += (int) target.SpellDamageTaken(slow.GetAbilityData("damage"), DamageType.Magical, me, slow.Name, minusMagicResistancePerc: plusPerc);
+                totalDamage += (int)target.SpellDamageTaken(slow.GetAbilityData("damage"), DamageType.Magical, me, slow.Name, minusMagicResistancePerc: plusPerc);
 
             if (me.CanAttack())
-                totalDamage += (int) target.DamageTaken(me.DamageAverage * 3, DamageType.Physical, me);
+                totalDamage += (int)target.DamageTaken(me.DamageAverage * 3, DamageType.Physical, me);
 
             //Game.PrintMessage(totalDamage.ToString(), MessageType.ChatMessage);
             //Game.PrintMessage((target.Health < totalDamage).ToString(), MessageType.ChatMessage);

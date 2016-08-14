@@ -67,6 +67,8 @@ namespace SkyWrathSharp
 
         public static MenuItem comboKey;
 
+        public static MenuItem harassKey;
+
         public static MenuItem drawTarget;
 
         public static MenuItem moveMode;
