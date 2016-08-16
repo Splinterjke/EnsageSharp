@@ -214,7 +214,7 @@ namespace SkyWrathSharp
             || !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(mysticflare.Name)
             || !mysticflare.CanBeCasted()
             || target.IsMagicImmune()
-            || target.MovementSpeed > 230
+            || target.MovementSpeed > 290
             || target.HasModifier("modifier_rune_haste")
             || !Utils.SleepCheck("ebsleep")
             || !IsFullDebuffed()
