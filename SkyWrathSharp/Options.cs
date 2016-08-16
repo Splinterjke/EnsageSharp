@@ -10,13 +10,13 @@ namespace SkyWrathSharp
             Menu = new Menu(AssemblyName, AssemblyName, true, heroName, true);
             comboKey = new MenuItem("comboKey", "Combo Key").SetValue(new KeyBind(70, KeyBindType.Press));
             harassKey = new MenuItem("harassKey", "Harass Key").SetValue(new KeyBind(68, KeyBindType.Press));
-            useBlink = new MenuItem("useBlink", "Use Blink Dagger").SetValue(false);
+            useBlink = new MenuItem("useBlink", "Use Blink Dagger").SetValue(false).SetTooltip("Auto-blink to target when Combo key is pressed.");
             soulRing = new MenuItem("soulRing", "Soulring").SetValue(true).SetTooltip("Use soulring before use the combo if your HP is greater than 150.");
             bladeMail = new MenuItem("bladeMail", "Check for BladeMail").SetValue(false);
             drawTarget = new MenuItem("drawTarget", "Target indicator").SetValue(true);
             moveMode = new MenuItem("moveMode", "Orbwalk").SetValue(true);
             predictionType = new MenuItem("predictionType", "Ultimate prediction").SetValue(new StringList(new[] { "InFront", "By MS/Direction"}));
-            ezKillCheck = new MenuItem("ezKillCheck", "Check for EZ Kill (beta)").SetValue(false).SetTooltip("Check if an enemy is ez-killable (low-mana costs and the fastest way to slay an enemy.");
+            ezKillCheck = new MenuItem("ezKillCheck", "Check for EZ Kill (beta)").SetValue(false).SetTooltip("Check if an enemy is ez-killable (low-mana costs and the fastest way to slay an enemy).");
             straightTimeCheck = new MenuItem("straightTimeCheck", "Straight time before ulti").SetValue(new Slider(0, 0, 2)).SetTooltip("At least time enemy's moving in straight before casting ulti.");
             ClosestToMouseRange = new MenuItem("ClosestToMouseRange", "Closest to mouse range").SetValue(new Slider(600, 500, 1200)).SetTooltip("Range that makes assembly checking for enemy in selected range.");
             
