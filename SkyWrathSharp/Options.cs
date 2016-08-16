@@ -10,6 +10,7 @@ namespace SkyWrathSharp
             Menu = new Menu(AssemblyName, AssemblyName, true, heroName, true);
             comboKey = new MenuItem("comboKey", "Combo Key").SetValue(new KeyBind(70, KeyBindType.Press));
             harassKey = new MenuItem("harassKey", "Harass Key").SetValue(new KeyBind(68, KeyBindType.Press));
+            useBlink = new MenuItem("useBlink", "Use Blink Dagger").SetValue(false);
             soulRing = new MenuItem("soulRing", "Soulring").SetValue(true).SetTooltip("Use soulring before use the combo if your HP is greater than 150.");
             bladeMail = new MenuItem("bladeMail", "Check for BladeMail").SetValue(false);
             drawTarget = new MenuItem("drawTarget", "Target indicator").SetValue(true);
@@ -26,6 +27,7 @@ namespace SkyWrathSharp
             
             Menu.AddItem(comboKey);
             Menu.AddItem(harassKey);
+            Menu.AddItem(useBlink);
             Menu.AddItem(soulRing);
             Menu.AddItem(bladeMail);
             Menu.AddItem(drawTarget);

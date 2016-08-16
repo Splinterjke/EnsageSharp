@@ -85,15 +85,19 @@ namespace SkyWrathSharp
 
         public static MenuItem bladeMail;
 
+        public static MenuItem useBlink;
+
         public static bool loaded;
 
         public static Ability bolt, slow, silence, mysticflare;
 
-        public static Item soulring, force_staff, cyclone, orchid, sheep, veil, shivas, dagon, atos, ethereal, medal, bloodthorn;
+        public static Item soulring, force_staff, cyclone, orchid, sheep, veil, shivas, dagon, atos, ethereal, medal, bloodthorn, blink;
 
         public static Hero me, target;
 
         public static Vector2 iconSize, screenPosition;
+
+        public static Vector3 predictXYZ;
 
         public static DotaTexture heroIcon;
 

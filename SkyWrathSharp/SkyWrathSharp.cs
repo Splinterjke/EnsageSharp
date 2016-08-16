@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Ensage;
 using Ensage.Common;
 using Ensage.Common.Menu;
@@ -83,6 +82,7 @@ namespace SkyWrathSharp
                     if (!target.UnitState.HasFlag(UnitState.Hexed) && !target.UnitState.HasFlag(UnitState.Stunned))
                         UseItem(sheep, sheep.GetCastRange());
 
+                    UseBlink();
                     CastAbility(silence, silence.GetCastRange());
                     CastAbility(slow, slow.GetCastRange());
                     CastAbility(bolt, bolt.GetCastRange());
@@ -119,6 +119,7 @@ namespace SkyWrathSharp
         private static void GetAbilities()
         {
             if (!Utils.SleepCheck("GetAbilities")) return;
+            blink = me.FindItem("item_blink");
             soulring = me.FindItem("item_soul_ring");
             medal = me.FindItem("item_medallion_of_courage");
             bloodthorn = me.FindItem("item_bloodthorn");
@@ -371,6 +372,22 @@ namespace SkyWrathSharp
                 case false:
                     return;
             }
+        }
+
+        private static void UseBlink()
+        {
+            if (!useBlink.GetValue<bool>() || blink == null || !blink.CanBeCasted() || target.Distance2D(me.Position) < 600 || !Utils.SleepCheck("blink")) return;
+            predictXYZ = target.NetworkActivity == NetworkActivity.Move
+                ? Prediction.InFront(target,(float)(target.MovementSpeed * (Game.Ping / 1000 + 0.3 + target.GetTurnTime(target))))
+                : target.Position;
+
+            if (me.Position.Distance2D(predictXYZ) > 1200)
+            {
+                predictXYZ = (predictXYZ - me.Position) * 1200 / predictXYZ.Distance2D(me.Position) + me.Position;
+            }
+
+            blink.UseAbility(predictXYZ);
+            Utils.Sleep(500, "blink");
         }
     }
 }
