@@ -87,7 +87,7 @@ namespace SkyWrathSharp
 
         public static MenuItem useBlink;
 
-        public static bool loaded;
+        public static bool loaded, ezKill;
 
         public static Ability bolt, slow, silence, mysticflare;
 

@@ -76,6 +76,12 @@ namespace SkyWrathSharp
 
                     Orbwalk();
 
+                    if (Utils.SleepCheck("ezkill"))
+                    {
+                        ezKill = IsEzKillable();
+                        Utils.Sleep(bolt.GetCooldown(bolt.Level - 1) * 2 + me.NetworkPosition.Distance2D(target.NetworkPosition) / 1200 * 1000 + 1000,"ezkill");
+                    }
+
                     if (soulring != null && soulring.CanBeCasted() && soulRing.GetValue<bool>())
                         soulring.UseAbility();
 
@@ -96,7 +102,8 @@ namespace SkyWrathSharp
 
                     UseDagon();
 
-                    CastUltimate();
+                    if (!ezKill)
+                        CastUltimate();
 
                     UseItem(shivas, shivas.GetCastRange());
 
@@ -219,8 +226,7 @@ namespace SkyWrathSharp
             || !Utils.SleepCheck("ebsleep")
             || !IsFullDebuffed()
             || target.Health * 100 / target.MaximumHealth < Menu.Item("noCastUlti").GetValue<Slider>().Value
-            || Prediction.StraightTime(target) / 1000 < straightTimeCheck.GetValue<Slider>().Value
-            || IsEzKillable())
+            || Prediction.StraightTime(target) / 1000 < straightTimeCheck.GetValue<Slider>().Value)
                 return;
 
             if (!target.CanMove() || target.NetworkActivity == NetworkActivity.Disabled || target.NetworkActivity == NetworkActivity.Idle ||
@@ -237,10 +243,10 @@ namespace SkyWrathSharp
                 case 0:
                     if (target.UnitState.HasFlag(UnitState.Hexed))
                     {
-                        mysticflare.UseAbility(Prediction.InFront(target, 85));
+                        mysticflare.UseAbility(Prediction.InFront(target, 87));
                         break;
                     }
-                    mysticflare.UseAbility(Prediction.InFront(target, 92));
+                    mysticflare.UseAbility(Prediction.InFront(target, 100));
                     break;
 
                 case 1:
@@ -322,14 +328,17 @@ namespace SkyWrathSharp
 
         private static bool IsEzKillable()
         {
-            if (!Menu.Item("ezKillCheck").GetValue<bool>() || !Utils.SleepCheck("ezkill")) return false;
+            if (!Menu.Item("ezKillCheck").GetValue<bool>() || target.Distance2D(me.Position) > 650) return false;
             var totalDamage = 0;
             var plusPerc = 0;
 
             if (ethereal != null && ethereal.CanBeCasted() &&
                 Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(ethereal.Name))
             {
-                totalDamage += (int)target.SpellDamageTaken((int)(me.TotalIntelligence * 2) + 75, DamageType.Magical, me, ethereal.Name);
+                totalDamage +=
+                    (int)
+                        target.SpellDamageTaken((int)(me.TotalIntelligence * 2) + 75, DamageType.Magical, me,
+                            ethereal.Name);
                 plusPerc += 40;
             }
 
@@ -343,22 +352,28 @@ namespace SkyWrathSharp
 
             if (dagon != null && dagon.CanBeCasted()
                 /*Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled("item_dagon")*/)
-                totalDamage += (int)target.SpellDamageTaken(dagon.GetAbilityData("damage"), DamageType.Magical, me, dagon.Name, minusMagicResistancePerc: plusPerc);
+                totalDamage +=
+                    (int)
+                        target.SpellDamageTaken(dagon.GetAbilityData("damage"), DamageType.Magical, me, dagon.Name,
+                            minusMagicResistancePerc: plusPerc);
 
             if (bolt != null && bolt.CanBeCasted() &&
                 Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(bolt.Name))
-                totalDamage += (int)target.SpellDamageTaken((bolt.GetAbilityData("bolt_damage") + me.TotalIntelligence * 1.6f) * 3, DamageType.Magical, me, bolt.Name, minusMagicResistancePerc: plusPerc);
+                totalDamage +=
+                    (int)
+                        target.SpellDamageTaken((bolt.GetAbilityData("bolt_damage") + me.TotalIntelligence * 1.6f) * 2,
+                            DamageType.Magical, me, bolt.Name, minusMagicResistancePerc: plusPerc);
 
             if (slow != null && slow.CanBeCasted() &&
                 Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(slow.Name))
-                totalDamage += (int)target.SpellDamageTaken(slow.GetAbilityData("damage"), DamageType.Magical, me, slow.Name, minusMagicResistancePerc: plusPerc);
+                totalDamage +=
+                    (int)
+                        target.SpellDamageTaken(slow.GetAbilityData("damage"), DamageType.Magical, me, slow.Name,
+                            minusMagicResistancePerc: plusPerc);
 
             if (me.CanAttack())
                 totalDamage += (int)target.DamageTaken(me.DamageAverage * 3, DamageType.Physical, me);
-
-            //Game.PrintMessage(totalDamage.ToString(), MessageType.ChatMessage);
-            //Game.PrintMessage((target.Health < totalDamage).ToString(), MessageType.ChatMessage);
-            Utils.Sleep(2000, "ezkill");
+            
             return target.Health < totalDamage;
         }
 
@@ -378,7 +393,7 @@ namespace SkyWrathSharp
         {
             if (!useBlink.GetValue<bool>() || blink == null || !blink.CanBeCasted() || target.Distance2D(me.Position) < 600 || !Utils.SleepCheck("blink")) return;
             predictXYZ = target.NetworkActivity == NetworkActivity.Move
-                ? Prediction.InFront(target,(float)(target.MovementSpeed * (Game.Ping / 1000 + 0.3 + target.GetTurnTime(target))))
+                ? Prediction.InFront(target, (float)(target.MovementSpeed * (Game.Ping / 1000 + 0.3 + target.GetTurnTime(target))))
                 : target.Position;
 
             if (me.Position.Distance2D(predictXYZ) > 1200)
