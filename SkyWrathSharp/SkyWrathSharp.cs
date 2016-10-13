@@ -12,15 +12,14 @@ namespace SkyWrathSharp
         public static void Init()
         {
             Options.MenuInit();
-
+            Game.OnUpdate += ComboUsage;
             Events.OnLoad += OnLoad;
             Events.OnClose += OnClose;
+            Drawing.OnDraw += TargetIndicator;
         }
 
         private static void OnClose(object sender, EventArgs e)
         {
-            Game.OnUpdate -= ComboUsage;
-            Drawing.OnDraw -= TargetIndicator;
             loaded = false;
             me = null;
             target = null;
@@ -38,12 +37,8 @@ namespace SkyWrathSharp
 
                 loaded = true;
                 Game.PrintMessage(
-                    "<font face='Calibri Bold'><font color='#fff511'>" + AssemblyName +
-                    " is Injected</font> (credits to <font color='#999999'>Splinter)</font>",
+                    "<font face='Calibri Bold'><font color='#fff511'>" + AssemblyName + " is Injected</font> (credits to <font color='#999999'>Splinter)</font>",
                     MessageType.LogMessage);
-                GetAbilities();
-                Game.OnUpdate += ComboUsage;
-                Drawing.OnDraw += TargetIndicator;
             }
 
             if (me == null || !me.IsValid)
@@ -56,11 +51,10 @@ namespace SkyWrathSharp
                 return;
 
             target = me.ClosestToMouseTarget(ClosestToMouseRange.GetValue<Slider>().Value);
-            if (lockedTarget == null || lockedTarget != target.Name)
-                lockedTarget = target.Name;
 
             if (Game.IsKeyDown(comboKey.GetValue<KeyBind>().Key))
             {
+
                 GetAbilities();
 
                 if (target == null || !target.IsValid || !target.IsVisible || target.IsIllusion || !target.IsAlive ||
@@ -82,13 +76,10 @@ namespace SkyWrathSharp
 
                     Orbwalk();
 
-                    if (target.Distance2D(me.Position) < 700 && lockedTarget == target.Name)
+                    if (Utils.SleepCheck("ezkill"))
                     {
-                        if (Utils.SleepCheck("ezkill"))
-                        {
-                            ezKill = IsEzKillable();
-                            Utils.Sleep(5000, "ezkill");
-                        }
+                        ezKill = IsEzKillable();
+                        Utils.Sleep(bolt.GetCooldown(bolt.Level - 1) * 2 + me.NetworkPosition.Distance2D(target.NetworkPosition) / 1200 * 1000 + 1000,"ezkill");
                     }
 
                     if (soulring != null && soulring.CanBeCasted() && soulRing.GetValue<bool>())
@@ -111,7 +102,8 @@ namespace SkyWrathSharp
 
                     UseDagon();
 
-                    CastUltimate();
+                    if (!ezKill)
+                        CastUltimate();
 
                     UseItem(shivas, shivas.GetCastRange());
 
@@ -157,8 +149,7 @@ namespace SkyWrathSharp
         private static bool HasModifiers()
         {
             if (target.HasModifiers(modifiersNames, false) ||
-                (bladeMail.GetValue<bool>() && target.HasModifier("modifier_item_blade_mail_reflect")) ||
-                !Utils.SleepCheck("HasModifiers"))
+                (bladeMail.GetValue<bool>() && target.HasModifier("modifier_item_blade_mail_reflect")) || !Utils.SleepCheck("HasModifiers"))
                 return true;
             Utils.Sleep(100, "HasModifiers");
             return false;
@@ -173,12 +164,8 @@ namespace SkyWrathSharp
                 circle = null;
                 return;
             }
-            if (target != null && target.IsValid && !target.IsIllusion && target.IsAlive && target.IsVisible &&
-                me.IsAlive)
-            {
+            if (target != null && target.IsValid && !target.IsIllusion && target.IsAlive && target.IsVisible && me.IsAlive)
                 DrawTarget();
-                DrawEzKill();
-            }
             else if (circle != null)
             {
                 circle.Dispose();
@@ -189,10 +176,9 @@ namespace SkyWrathSharp
         private static void DrawTarget()
         {
             heroIcon = Drawing.GetTexture("materials/ensage_ui/miniheroes/skywrath_mage");
-            iconSize = new Vector2(HUDInfo.GetHpBarSizeY()*2);
+            iconSize = new Vector2(HUDInfo.GetHpBarSizeY() * 2);
 
-            if (
-                !Drawing.WorldToScreen(target.Position + new Vector3(0, 0, target.HealthBarOffset/3), out screenPosition))
+            if (!Drawing.WorldToScreen(target.Position + new Vector3(0, 0, target.HealthBarOffset / 3), out screenPosition))
                 return;
 
             screenPosition += new Vector2(-iconSize.X, 0);
@@ -213,59 +199,6 @@ namespace SkyWrathSharp
             }
         }
 
-        private static void DrawEzKill()
-        {
-            if (!Menu.Item("ezKillCheck").GetValue<bool>() || Game.IsWatchingGame || Game.IsChatOpen) return;
-            switch (ezKillStyle.GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    var icoSize = new Vector2((float) (HUDInfo.GetHpBarSizeY()*2));
-                    var icoPos = HUDInfo.GetHPbarPosition(target) - new Vector2(21, 5);
-                    switch (IsEzKillable())
-                    {
-                        case true:
-                            ezkillIcon = Drawing.GetTexture("materials/ensage_ui/emoticons/bc_emoticon_fire");
-                            break;
-                        case false:
-                            ezkillIcon = null;
-                            break;
-                    }
-                    Drawing.DrawRect(icoPos, icoSize, ezkillIcon);
-                    break;
-
-                case 1:
-                    var pos = HUDInfo.GetHPbarPosition(target);
-                    var size = HUDInfo.GetHpBarSizeY() + 3;
-                    var text = string.Empty;
-                    var color = new Color();
-                    var fontFlags = FontFlags.AntiAlias | FontFlags.Additive;
-                    if (Game.IsKeyDown(comboKey.GetValue<KeyBind>().Key))
-                    {
-                        pos = pos - new Vector2(58, 0);
-                        text = "CASTING...";
-                        color = Color.Crimson;
-                    }
-                    else
-                    {
-                        switch (IsEzKillable())
-                        {
-                            case true:
-                                pos = pos - new Vector2(40, 0);
-                                text = "EZKILL";
-                                color = Color.Chartreuse;
-                                break;
-                            case false:
-                                pos = pos - new Vector2(63, 0);
-                                text = "NON-EZKILL";
-                                color = Color.White;
-                                break;
-                        }
-                    }
-                    Drawing.DrawText(text, pos, new Vector2(size), color, fontFlags);
-                    break;
-            }
-        }
-
         private static void CastAbility(Ability ability, float range)
         {
             if (ability == null || !ability.CanBeCasted() || ability.IsInAbilityPhase || target.IsMagicImmune() ||
@@ -275,16 +208,9 @@ namespace SkyWrathSharp
             if (ability.IsAbilityBehavior(AbilityBehavior.UnitTarget))
             {
                 ability.UseAbility(target);
-                return;
             }
             if (ability.IsAbilityBehavior(AbilityBehavior.NoTarget))
             {
-                if (Equals(ability, slow))
-                {
-                    ability.UseAbility();
-                    Utils.Sleep(me.NetworkPosition.Distance2D(target.NetworkPosition)/800*1000, "slowsleep");
-                    return;
-                }
                 ability.UseAbility();
             }
         }
@@ -292,20 +218,18 @@ namespace SkyWrathSharp
         private static void CastUltimate()
         {
             if (mysticflare == null
-                || !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(mysticflare.Name)
-                || !mysticflare.CanBeCasted()
-                || target.IsMagicImmune()
-                || !IsFullDebuffed()
-                || ezKill
-                || target.HasModifier("modifier_rune_haste")
-                || target.Health*100/target.MaximumHealth < Menu.Item("noCastUlti").GetValue<Slider>().Value
-                || Prediction.StraightTime(target)/1000 < straightTimeCheck.GetValue<Slider>().Value
-                || !Utils.SleepCheck("ebsleep")
-                || !Utils.SleepCheck("slowsleep"))
+            || !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(mysticflare.Name)
+            || !mysticflare.CanBeCasted()
+            || target.IsMagicImmune()
+            || target.MovementSpeed > 290
+            || target.HasModifier("modifier_rune_haste")
+            || !Utils.SleepCheck("ebsleep")
+            || !IsFullDebuffed()
+            || target.Health * 100 / target.MaximumHealth < Menu.Item("noCastUlti").GetValue<Slider>().Value
+            || Prediction.StraightTime(target) / 1000 < straightTimeCheck.GetValue<Slider>().Value)
                 return;
 
-            if (!target.CanMove() || target.NetworkActivity == NetworkActivity.Disabled ||
-                target.NetworkActivity == NetworkActivity.Idle ||
+            if (!target.CanMove() || target.NetworkActivity == NetworkActivity.Disabled || target.NetworkActivity == NetworkActivity.Idle ||
                 target.UnitState.HasFlag(UnitState.Frozen) || target.UnitState.HasFlag(UnitState.Stunned))
                 mysticflare.UseAbility(target.NetworkPosition);
             else
@@ -322,23 +246,19 @@ namespace SkyWrathSharp
                         mysticflare.UseAbility(Prediction.InFront(target, 87));
                         break;
                     }
-                    mysticflare.UseAbility(target.MovementSpeed > 230
-                        ? Prediction.InFront(target, 260)
-                        : Prediction.InFront(target, 100));
+                    mysticflare.UseAbility(Prediction.InFront(target, 100));
                     break;
 
                 case 1:
                     if (target.UnitState.HasFlag(UnitState.Hexed))
                     {
-                        mysticflare.UseAbility(Prediction.PredictedXYZ(target, 210/target.MovementSpeed*1000));
+                        mysticflare.UseAbility(Prediction.PredictedXYZ(target, 210 / target.MovementSpeed * 1000));
                         break;
                     }
-                    mysticflare.UseAbility();
-                    mysticflare.UseAbility(target.MovementSpeed > 230
-                        ? Prediction.PredictedXYZ(target, 310/target.MovementSpeed*1000)
-                        : Prediction.PredictedXYZ(target, 230/target.MovementSpeed*1000));
+                    mysticflare.UseAbility(Prediction.PredictedXYZ(target, 230 / target.MovementSpeed * 1000));
                     break;
             }
+
         }
 
         private static void UseDagon()
@@ -365,7 +285,7 @@ namespace SkyWrathSharp
                 if (Equals(item, ethereal))
                 {
                     item.UseAbility(target);
-                    Utils.Sleep(me.NetworkPosition.Distance2D(target.NetworkPosition)/1200*1000, "ebsleep");
+                    Utils.Sleep(me.NetworkPosition.Distance2D(target.NetworkPosition) / 1200 * 1000, "ebsleep");
                     return;
                 }
                 item.UseAbility(target);
@@ -386,49 +306,29 @@ namespace SkyWrathSharp
 
         private static void PopLinkens(Ability item)
         {
-            if (item == null || !item.CanBeCasted() ||
-                !Menu.Item("popLinkensItems").GetValue<AbilityToggler>().IsEnabled(item.Name) ||
-                !Utils.SleepCheck("PopLinkens")) return;
+            if (item == null || !item.CanBeCasted() || !Menu.Item("popLinkensItems").GetValue<AbilityToggler>().IsEnabled(item.Name) || !Utils.SleepCheck("PopLinkens")) return;
             item.UseAbility(target);
             Utils.Sleep(100, "PopLinkens");
         }
 
         private static bool IsFullDebuffed()
         {
-            if ((atos != null && atos.CanBeCasted() &&
-                 Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(atos.Name) &&
-                 !target.HasModifier("modifier_item_rod_of_atos"))
+            if ((veil != null && veil.CanBeCasted() && Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(veil.Name) && !target.HasModifier("modifier_item_veil_of_discord"))
                 ||
-                (veil != null && veil.CanBeCasted() &&
-                 Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(veil.Name) &&
-                 !target.HasModifier("modifier_item_veil_of_discord"))
+                (silence != null && silence.CanBeCasted() && Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(silence.Name) && !target.HasModifier("modifier_skywrath_mage_ancient_seal"))
                 ||
-                (silence != null && silence.CanBeCasted() &&
-                 Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(silence.Name) &&
-                 !target.HasModifier("modifier_skywrath_mage_ancient_seal"))
+                (orchid != null && orchid.CanBeCasted() && Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(orchid.Name) && !target.HasModifier("modifier_item_orchid_malevolence"))
                 ||
-                (orchid != null && orchid.CanBeCasted() &&
-                 Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(orchid.Name) &&
-                 !target.HasModifier("modifier_item_orchid_malevolence"))
+                (ethereal != null && ethereal.CanBeCasted() && Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(ethereal.Name) && !target.HasModifier("modifier_item_ethereal_blade_slow"))
                 ||
-                (ethereal != null && ethereal.CanBeCasted() &&
-                 Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(ethereal.Name) &&
-                 !target.HasModifier("modifier_item_ethereal_blade_slow"))
-                ||
-                (bloodthorn != null && bloodthorn.CanBeCasted() &&
-                 Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(bloodthorn.Name) &&
-                 !target.HasModifier("modifier_item_bloodthorn"))
-                ||
-                (slow != null && slow.CanBeCasted() &&
-                 Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(slow.Name) &&
-                 !target.HasModifier("modifier_skywrath_mage_concussive_shot_slow")))
+                (bloodthorn != null && bloodthorn.CanBeCasted() && Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(bloodthorn.Name) && !target.HasModifier("modifier_item_bloodthorn")))
                 return false;
             return true;
         }
 
         private static bool IsEzKillable()
         {
-            if (!Menu.Item("ezKillCheck").GetValue<bool>()) return false;
+            if (!Menu.Item("ezKillCheck").GetValue<bool>() || target.Distance2D(me.Position) > 650) return false;
             var totalDamage = 0;
             var plusPerc = 0;
 
@@ -437,7 +337,7 @@ namespace SkyWrathSharp
             {
                 totalDamage +=
                     (int)
-                        target.SpellDamageTaken((int) (me.TotalIntelligence*2) + 75, DamageType.Magical, me,
+                        target.SpellDamageTaken((int)(me.TotalIntelligence * 2) + 75, DamageType.Magical, me,
                             ethereal.Name);
                 plusPerc += 40;
             }
@@ -448,7 +348,7 @@ namespace SkyWrathSharp
 
             if (silence != null && silence.CanBeCasted() &&
                 Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(silence.Name))
-                plusPerc += (int) ((silence.Level - 1)*5 + 30);
+                plusPerc += (int)((silence.Level - 1) * 5 + 30);
 
             if (dagon != null && dagon.CanBeCasted()
                 /*Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled("item_dagon")*/)
@@ -461,7 +361,7 @@ namespace SkyWrathSharp
                 Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(bolt.Name))
                 totalDamage +=
                     (int)
-                        target.SpellDamageTaken((bolt.GetAbilityData("bolt_damage") + me.TotalIntelligence*1.6f)*2,
+                        target.SpellDamageTaken((bolt.GetAbilityData("bolt_damage") + me.TotalIntelligence * 1.6f) * 2,
                             DamageType.Magical, me, bolt.Name, minusMagicResistancePerc: plusPerc);
 
             if (slow != null && slow.CanBeCasted() &&
@@ -472,8 +372,8 @@ namespace SkyWrathSharp
                             minusMagicResistancePerc: plusPerc);
 
             if (me.CanAttack())
-                totalDamage += (int) target.DamageTaken(me.DamageAverage*3, DamageType.Physical, me);
-
+                totalDamage += (int)target.DamageTaken(me.DamageAverage * 3, DamageType.Physical, me);
+            
             return target.Health < totalDamage;
         }
 
@@ -485,22 +385,20 @@ namespace SkyWrathSharp
                     Orbwalking.Orbwalk(target);
                     break;
                 case false:
-                    break;
+                    return;
             }
         }
 
         private static void UseBlink()
         {
-            if (!useBlink.GetValue<bool>() || blink == null || !blink.CanBeCasted() ||
-                target.Distance2D(me.Position) < 600 || !Utils.SleepCheck("blink")) return;
+            if (!useBlink.GetValue<bool>() || blink == null || !blink.CanBeCasted() || target.Distance2D(me.Position) < 600 || !Utils.SleepCheck("blink")) return;
             predictXYZ = target.NetworkActivity == NetworkActivity.Move
-                ? Prediction.InFront(target,
-                    (float) (target.MovementSpeed*(Game.Ping/1000 + 0.3 + target.GetTurnTime(target))))
+                ? Prediction.InFront(target, (float)(target.MovementSpeed * (Game.Ping / 1000 + 0.3 + target.GetTurnTime(target))))
                 : target.Position;
 
             if (me.Position.Distance2D(predictXYZ) > 1200)
             {
-                predictXYZ = (predictXYZ - me.Position)*1200/predictXYZ.Distance2D(me.Position) + me.Position;
+                predictXYZ = (predictXYZ - me.Position) * 1200 / predictXYZ.Distance2D(me.Position) + me.Position;
             }
 
             blink.UseAbility(predictXYZ);
