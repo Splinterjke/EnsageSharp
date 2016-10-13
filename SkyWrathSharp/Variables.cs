@@ -63,7 +63,7 @@ namespace SkyWrathSharp
 
         public static Menu noCastUlti;
 
-        public static MenuItem comboOrder;
+        public static Menu ezkillmenu;
 
         public static MenuItem comboKey;
 
@@ -74,6 +74,8 @@ namespace SkyWrathSharp
         public static MenuItem moveMode;
 
         public static MenuItem ezKillCheck;
+
+        public static MenuItem ezKillStyle;
 
         public static MenuItem straightTimeCheck;
 
@@ -87,6 +89,8 @@ namespace SkyWrathSharp
 
         public static MenuItem useBlink;
 
+        public static MenuItem nocastulti;
+
         public static bool loaded, ezKill;
 
         public static Ability bolt, slow, silence, mysticflare;
@@ -97,9 +101,11 @@ namespace SkyWrathSharp
 
         public static Vector2 iconSize, screenPosition;
 
+        public static string lockedTarget;
+
         public static Vector3 predictXYZ;
 
-        public static DotaTexture heroIcon;
+        public static DotaTexture heroIcon, ezkillIcon;
 
         public static ParticleEffect circle;
     }
