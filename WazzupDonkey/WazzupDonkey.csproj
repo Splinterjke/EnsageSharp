@@ -55,13 +55,13 @@
       <HintPath>D:\gAQLhvKAv NEW\References\Ensage.dll</HintPath>
     </Reference>
     <Reference Include="Ensage.Common">
-      <HintPath>D:\gAQLhvKAv NEW\References\Ensage.Common.dll</HintPath>
+      <HintPath>D:\Ensage\References\Ensage.Common.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>D:\gAQLhvKAv NEW\References\SharpDX.dll</HintPath>
+      <HintPath>D:\Ensage\References\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D9">
-      <HintPath>D:\gAQLhvKAv NEW\References\SharpDX.Direct3D9.dll</HintPath>
+      <HintPath>D:\Ensage\References\SharpDX.Direct3D9.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
