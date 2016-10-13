@@ -16,14 +16,18 @@ namespace SkyWrathSharp
             drawTarget = new MenuItem("drawTarget", "Target indicator").SetValue(true);
             moveMode = new MenuItem("moveMode", "Orbwalk").SetValue(true);
             predictionType = new MenuItem("predictionType", "Ultimate prediction").SetValue(new StringList(new[] { "InFront", "By MS/Direction"}));
-            ezKillCheck = new MenuItem("ezKillCheck", "Check for EZ Kill (beta)").SetValue(false).SetTooltip("Check if an enemy is ez-killable (low-mana costs and the fastest way to slay an enemy).");
+            ezKillCheck = new MenuItem("ezKillCheck", "Check for EZ Kill").SetValue(true).SetTooltip("Check if an enemy is ez-killable (low-mana costs and the fastest way to slay an enemy).");
+            ezKillStyle = new MenuItem("ezKillIndicator", "Indicator style").SetValue(new StringList(new[] {"Icon", "Text"}));
             straightTimeCheck = new MenuItem("straightTimeCheck", "Straight time before ulti").SetValue(new Slider(0, 0, 2)).SetTooltip("At least time enemy's moving in straight before casting ulti.");
             ClosestToMouseRange = new MenuItem("ClosestToMouseRange", "Closest to mouse range").SetValue(new Slider(600, 500, 1200)).SetTooltip("Range that makes assembly checking for enemy in selected range.");
-            
+            nocastulti = new MenuItem("noCastUlti", "Do not use ulti if % of enemy's HP is below: ").SetValue(new Slider(35));
+
+
             noCastUlti = new Menu("Ultimate usage", "Ultimate usage");
             magicItems = new Menu("Magic Damage Items", "Magic Damage Items");
             popLinkensItems = new Menu("Pop Linkens Items", "Pop Linkens Items");
             abilities = new Menu("Abilities", "Abilities");
+            ezkillmenu = new Menu("EZkill Menu", "ezkillmenu");
             
             Menu.AddItem(comboKey);
             Menu.AddItem(harassKey);
@@ -33,7 +37,6 @@ namespace SkyWrathSharp
             Menu.AddItem(drawTarget);
             Menu.AddItem(moveMode);
             Menu.AddItem(predictionType);
-            Menu.AddItem(ezKillCheck);
             Menu.AddItem(straightTimeCheck);
             Menu.AddItem(ClosestToMouseRange);
 
@@ -41,6 +44,7 @@ namespace SkyWrathSharp
             Menu.AddSubMenu(popLinkensItems);
             Menu.AddSubMenu(abilities);
             Menu.AddSubMenu(noCastUlti);
+            Menu.AddSubMenu(ezkillmenu);
 
             magicItems.AddItem(
                 new MenuItem("magicItems", "Magic Damage").SetValue(
@@ -51,8 +55,10 @@ namespace SkyWrathSharp
             abilities.AddItem(new MenuItem("abilities", "Abilities").SetValue(
                 new AbilityToggler(abilitiesDictionary)));
 
-            noCastUlti.AddItem(
-                new MenuItem("noCastUlti", "Do not use ulti if % of enemy's HP is below: ").SetValue(new Slider(35)));
+            noCastUlti.AddItem(nocastulti);
+
+            ezkillmenu.AddItem(ezKillCheck);
+            ezkillmenu.AddItem(ezKillStyle);
 
             Menu.AddToMainMenu();
         }
