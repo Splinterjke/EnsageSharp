@@ -56,8 +56,6 @@ namespace SkyWrathSharp
                 return;
 
             target = me.ClosestToMouseTarget(ClosestToMouseRange.GetValue<Slider>().Value);
-            if (lockedTarget == null || lockedTarget != target.Name)
-                lockedTarget = target.Name;
 
             if (Game.IsKeyDown(comboKey.GetValue<KeyBind>().Key))
             {
@@ -82,7 +80,7 @@ namespace SkyWrathSharp
 
                     Orbwalk();
 
-                    if (target.Distance2D(me.Position) < 700 && lockedTarget == target.Name)
+                    if (target.Distance2D(me.Position) < 700)
                     {
                         if (Utils.SleepCheck("ezkill"))
                         {
