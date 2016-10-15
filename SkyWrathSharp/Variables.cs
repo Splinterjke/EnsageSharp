@@ -101,8 +101,6 @@ namespace SkyWrathSharp
 
         public static Vector2 iconSize, screenPosition;
 
-        public static string lockedTarget;
-
         public static Vector3 predictXYZ;
 
         public static DotaTexture heroIcon, ezkillIcon;
