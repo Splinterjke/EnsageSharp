@@ -97,8 +97,8 @@ namespace SkyWrathSharp
 
                     UseBlink();
                     CastAbility(silence, silence.GetCastRange());
-                    CastAbility(slow, slow.GetCastRange());
                     CastAbility(bolt, bolt.GetCastRange());
+                    CastAbility(slow, slow.GetCastRange());
 
                     UseItem(atos, atos.GetCastRange(), 140);
                     UseItem(medal, medal.GetCastRange());
@@ -358,14 +358,15 @@ namespace SkyWrathSharp
                 !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(item.Name))
                 return;
 
+            if (item.Name.Contains("ethereal") && IsFullDebuffed())
+            {
+                item.UseAbility(target);
+                Utils.Sleep(me.NetworkPosition.Distance2D(target.NetworkPosition) / 1200 * 1000, "ebsleep");
+                return;
+            }
+
             if (item.IsAbilityBehavior(AbilityBehavior.UnitTarget) && !item.Name.Contains("item_dagon"))
             {
-                if (Equals(item, ethereal))
-                {
-                    item.UseAbility(target);
-                    Utils.Sleep(me.NetworkPosition.Distance2D(target.NetworkPosition)/1200*1000, "ebsleep");
-                    return;
-                }
                 item.UseAbility(target);
                 return;
             }
@@ -427,8 +428,9 @@ namespace SkyWrathSharp
         private static bool IsEzKillable()
         {
             if (!Menu.Item("ezKillCheck").GetValue<bool>()) return false;
-            var totalDamage = 0;
-            var plusPerc = 0;
+            int totalDamage = 0;
+            int plusPerc = 0;
+            uint reqMana = 0;
 
             if (ethereal != null && ethereal.CanBeCasted() &&
                 Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(ethereal.Name))
@@ -438,41 +440,73 @@ namespace SkyWrathSharp
                         target.SpellDamageTaken((int) (me.TotalIntelligence*2) + 75, DamageType.Magical, me,
                             ethereal.Name);
                 plusPerc += 40;
+                reqMana += ethereal.ManaCost;
             }
 
             if (veil != null && veil.CanBeCasted() &&
                 Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(veil.Name))
+            {
                 plusPerc += 25;
+                reqMana += veil.ManaCost;
+            }
+
 
             if (silence != null && silence.CanBeCasted() &&
                 Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(silence.Name))
-                plusPerc += (int) ((silence.Level - 1)*5 + 30);
+            {
+                plusPerc += (int)((silence.Level - 1) * 5 + 30);
+                reqMana += silence.ManaCost;
+            }
+
 
             if (dagon != null && dagon.CanBeCasted()
                 /*Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled("item_dagon")*/)
+            {
                 totalDamage +=
                     (int)
                         target.SpellDamageTaken(dagon.GetAbilityData("damage"), DamageType.Magical, me, dagon.Name,
                             minusMagicResistancePerc: plusPerc);
+                reqMana += dagon.ManaCost;
+            }
+                
 
             if (bolt != null && bolt.CanBeCasted() &&
                 Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(bolt.Name))
-                totalDamage +=
-                    (int)
-                        target.SpellDamageTaken((bolt.GetAbilityData("bolt_damage") + me.TotalIntelligence*1.6f)*2,
-                            DamageType.Magical, me, bolt.Name, minusMagicResistancePerc: plusPerc);
+            {
+                if (bolt.Level < 4)
+                {
+                    totalDamage +=
+                        (int)
+                            target.SpellDamageTaken((bolt.GetAbilityData("bolt_damage") + me.TotalIntelligence * 1.6f) * 1,
+                                DamageType.Magical, me, bolt.Name, minusMagicResistancePerc: plusPerc);
+                    reqMana += bolt.ManaCost;
+                }
+                    
+                else
+                {
+                    totalDamage +=
+                        (int)
+                            target.SpellDamageTaken((bolt.GetAbilityData("bolt_damage") + me.TotalIntelligence * 1.6f) * 2,
+                                DamageType.Magical, me, bolt.Name, minusMagicResistancePerc: plusPerc);
+                    reqMana += bolt.ManaCost*2;
+                }
+            }
 
             if (slow != null && slow.CanBeCasted() &&
                 Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(slow.Name))
+            {
                 totalDamage +=
                     (int)
                         target.SpellDamageTaken(slow.GetAbilityData("damage"), DamageType.Magical, me, slow.Name,
                             minusMagicResistancePerc: plusPerc);
+                reqMana += slow.ManaCost;
+            }
+                
 
             if (me.CanAttack())
-                totalDamage += (int) target.DamageTaken(me.DamageAverage*3, DamageType.Physical, me);
+                totalDamage += (int) target.DamageTaken(me.DamageAverage*2, DamageType.Physical, me);
 
-            return target.Health < totalDamage;
+            return reqMana < me.Mana && target.Health < totalDamage;
         }
 
         private static void Orbwalk()
