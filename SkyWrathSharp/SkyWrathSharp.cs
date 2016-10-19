@@ -56,7 +56,6 @@ namespace SkyWrathSharp
                 return;
 
             target = me.ClosestToMouseTarget(ClosestToMouseRange.GetValue<Slider>().Value);
-
             if (Game.IsKeyDown(comboKey.GetValue<KeyBind>().Key))
             {
                 GetAbilities();
@@ -302,9 +301,9 @@ namespace SkyWrathSharp
                 || !Utils.SleepCheck("slowsleep"))
                 return;
 
-            if (!target.CanMove() || target.NetworkActivity == NetworkActivity.Disabled ||
-                target.NetworkActivity == NetworkActivity.Idle ||
-                target.UnitState.HasFlag(UnitState.Frozen) || target.UnitState.HasFlag(UnitState.Stunned))
+            if (!target.CanMove() ||
+                target.UnitState.HasFlag(UnitState.Rooted) ||
+                target.UnitState.HasFlag(UnitState.Stunned))
                 mysticflare.UseAbility(target.NetworkPosition);
             else
                 GetPrediction();
@@ -320,21 +319,15 @@ namespace SkyWrathSharp
                         mysticflare.UseAbility(Prediction.InFront(target, 87));
                         break;
                     }
-                    mysticflare.UseAbility(target.MovementSpeed > 230
-                        ? Prediction.InFront(target, 260)
-                        : Prediction.InFront(target, 100));
+                    mysticflare.UseAbility(Prediction.InFront(target, 100));
                     break;
-
                 case 1:
                     if (target.UnitState.HasFlag(UnitState.Hexed))
                     {
                         mysticflare.UseAbility(Prediction.PredictedXYZ(target, 210/target.MovementSpeed*1000));
                         break;
                     }
-                    mysticflare.UseAbility();
-                    mysticflare.UseAbility(target.MovementSpeed > 230
-                        ? Prediction.PredictedXYZ(target, 310/target.MovementSpeed*1000)
-                        : Prediction.PredictedXYZ(target, 230/target.MovementSpeed*1000));
+                    mysticflare.UseAbility(Prediction.PredictedXYZ(target, 230/target.MovementSpeed*1000));
                     break;
             }
         }
