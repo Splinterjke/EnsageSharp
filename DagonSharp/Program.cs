@@ -71,7 +71,7 @@ namespace DagonSharp
 
             if (me.IsChanneling() || me.IsInvisible() || !Menu.Item("toggle").GetValue<KeyBind>().Active) return;
             dagon = me.GetDagon();
-            target = ObjectManager.GetEntities<Hero>().FirstOrDefault(CheckTarget);
+            target = ObjectManager.GetEntitiesParallel<Hero>().FirstOrDefault(CheckTarget);
 
             if (dagon == null || target == null || !me.CanUseItems() || !dagon.CanBeCasted()) return;
             dagon.UseAbility(target);
@@ -80,13 +80,7 @@ namespace DagonSharp
 
         private static bool CheckTarget(Unit enemy)
         {
-            if (enemy == null || enemy.IsIllusion || !enemy.IsValidTarget(dagon.GetCastRange(), true, me.NetworkPosition))
-                return false;
-
-            if (enemy.IsLinkensProtected() || enemy.IsMagicImmune())
-                return false;
-
-            if (!enemy.CanDie() || enemy.Modifiers.Any(x => IgnoreModifiers.Any(x.Name.Equals)))
+            if (enemy == null || enemy.IsIllusion || !enemy.IsValidTarget(dagon.GetCastRange(), true, me.NetworkPosition) || enemy.IsLinkensProtected() || enemy.IsMagicImmune() || !enemy.CanDie() || enemy.Modifiers.Any(x => IgnoreModifiers.Any(x.Name.Equals)))
                 return false;
 
            return enemy.Health <
