@@ -288,17 +288,15 @@ namespace SkyWrathSharp
 
         private static void CastUltimate()
         {
-            if (mysticflare == null
-                || !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(mysticflare.Name)
-                || !mysticflare.CanBeCasted()
-                || target.IsMagicImmune()
-                || !IsFullDebuffed()
-                || ezKill
-                || target.HasModifier("modifier_rune_haste")
-                || target.Health*100/target.MaximumHealth < Menu.Item("noCastUlti").GetValue<Slider>().Value
-                || Prediction.StraightTime(target)/1000 < straightTimeCheck.GetValue<Slider>().Value
-                || !Utils.SleepCheck("ebsleep")
-                || !Utils.SleepCheck("slowsleep"))
+			if (mysticflare == null
+				|| !Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(mysticflare.Name)
+				|| !mysticflare.CanBeCasted()
+				|| target.IsMagicImmune()
+				|| !IsFullDebuffed()
+				|| ezKill
+				|| target.HasModifier("modifier_rune_haste")
+				|| target.Health * 100 / target.MaximumHealth < Menu.Item("noCastUlti").GetValue<Slider>().Value
+				|| Prediction.StraightTime(target) / 1000 < straightTimeCheck.GetValue<Slider>().Value)
                 return;
 
             if (!target.CanMove() ||
@@ -351,14 +349,21 @@ namespace SkyWrathSharp
                 !Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(item.Name))
                 return;
 
-            if (item.Name.Contains("ethereal") && IsFullDebuffed())
+            if (item == ethereal && IsFullDebuffed())
             {
                 item.UseAbility(target);
                 Utils.Sleep(me.NetworkPosition.Distance2D(target.NetworkPosition) / 1200 * 1000, "ebsleep");
                 return;
             }
 
-            if (item.IsAbilityBehavior(AbilityBehavior.UnitTarget) && !item.Name.Contains("item_dagon"))
+			if (item == atos)
+			{
+				item.UseAbility(target);
+				Utils.Sleep(me.NetworkPosition.Distance2D(target.NetworkPosition) / 1500 * 1000, "atossleep");
+				return;
+			}
+
+			if (item.IsAbilityBehavior(AbilityBehavior.UnitTarget) && !item.Name.Contains("item_dagon"))
             {
                 item.UseAbility(target);
                 return;
@@ -389,7 +394,7 @@ namespace SkyWrathSharp
         {
             if ((atos != null && atos.CanBeCasted() &&
                  Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(atos.Name) &&
-                 !target.HasModifier("modifier_item_rod_of_atos"))
+                 !target.HasModifier("modifier_item_rod_of_atos") && !Utils.SleepCheck("atossleep"))
                 ||
                 (veil != null && veil.CanBeCasted() &&
                  Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(veil.Name) &&
@@ -405,15 +410,15 @@ namespace SkyWrathSharp
                 ||
                 (ethereal != null && ethereal.CanBeCasted() &&
                  Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(ethereal.Name) &&
-                 !target.HasModifier("modifier_item_ethereal_blade_slow"))
-                ||
+                 !target.HasModifier("modifier_item_ethereal_blade_slow") && !Utils.SleepCheck("slowsleep"))
+				||
                 (bloodthorn != null && bloodthorn.CanBeCasted() &&
                  Menu.Item("magicItems").GetValue<AbilityToggler>().IsEnabled(bloodthorn.Name) &&
                  !target.HasModifier("modifier_item_bloodthorn"))
                 ||
                 (slow != null && slow.CanBeCasted() &&
                  Menu.Item("abilities").GetValue<AbilityToggler>().IsEnabled(slow.Name) &&
-                 !target.HasModifier("modifier_skywrath_mage_concussive_shot_slow")))
+                 !target.HasModifier("modifier_skywrath_mage_concussive_shot_slow")) && !Utils.SleepCheck("slowsleep"))
                 return false;
             return true;
         }
